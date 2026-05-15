@@ -1,3 +1,4 @@
 # lanl-met
-Utility codes for EPC-CP Meteorology Team.
-Please reference this O# (O4948) in your repository readme file so that copyright assertion can be confirmed.
+A collection of useful codes maintained by the Los Alamos National Lab Meteorology Team, EPC-CP.
+O# O4948
+Kenneth Waight, May 2026
