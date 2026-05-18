@@ -1,0 +1,5 @@
+  ' RM Young 05305-AQ Horizontal Wind Speed & Direction Sensor (2)
+  WindVector (1,HWSpd2_ms,HWDir2_deg,FP2,False,0,0,1)  'RMY05305 (2) Sensor
+  FieldNames("HWSpd2_ms_Avg,HWDir2_deg_Avg")
+  StdDev(1,HWSpd2_ms,FP2,False)  'StdDev RMY05305 (2) Wind Speed
+  FieldNames("HWSpd2_ms_Std")

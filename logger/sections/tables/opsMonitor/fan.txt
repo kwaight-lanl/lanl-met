@@ -1,0 +1,4 @@
+  Average (1,FanLvl1_Hz,FP2,False)'Level-0 Air Temp Aspiration Fan RPMs
+  FieldNames("FanLvl1_AvgRPM)")'Level 0 & 1 Aspiration Fans RPMs.
+  Average (1,FanLvl2_Hz,FP2,False)'Level-1 Air Temp Aspiration Fan RPMs
+  FieldNames("FanLvl2_AvgRPM")'Level 0 & 1 Aspiration Fans RPMs.

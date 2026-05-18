@@ -1,0 +1,54 @@
+    If TimeIntoInterval(1,15,min)Then
+      If Dat15min.SWDN_AVGWm2 < 6 Then 'Night should be considered <6 W/m2 from shortwave down measurement
+        Sun = False
+      Else
+        Sun = True
+      EndIf
+      If Sun = True Then SunHourDuration = SunHourDuration+15
+      Daylit = SunHourDuration/60  'Calculate hours of sun duration for a day
+      If Dat15min.Rain_TOTinch > 0 Then Daily_Precip_Time = Daily_Precip_Time + 15
+    EndIf
+
+    CallTable EMC_Vals
+
+    ' ---------------Calc 100 hr & 1000 Hr Fuel M--------
+    If TimeIntoInterval(1439,1440,min) Then
+      '100 Hr Fuel Moisture
+      If ABS(Dat24Hr.FuelM100Hr_prct(1,1)-FuelM100Hr_Yest) < 2.0 Then
+        FuelM100Hr_Yest = Dat24Hr.FuelM100Hr_prct(1,1)
+      Else
+        FuelM100Hr_Yest = Init100
+      EndIf
+      'If FuelM100Hr_Yest = NAN Then FuelM100Hr_Yest = 15 '(5 + 5*CLIMAT) where CLIMAT is regional and = 2
+      If FuelM100Hr_Yest = NAN Then FuelM100Hr_Yest = Init100
+      '1st time through set to 10% so calc doesn't = NAN
+      PPTDUR = Daily_Precip_Time/60 'Get time of precip in hours
+      EMCBar = (Daylit*EMC_Vals.EMCMin(1,1) + (24.0-Daylit)*EMC_Vals.EMCMax(1,1))/24.0
+      BNDRYH = ((24.0-PPTDUR)*EMCBar + PPTDUR*(0.5*PPTDUR + 41.0))/24.0
+      FuelM100Hr_prct = FuelM100Hr_Yest+(BNDRYH-FuelM100Hr_Yest)*(1.0-0.87*EXP(-0.24))
+
+      '1000 Hr Fuel Moisture
+      'Calculate average of BNDRYT over previous seven days.
+      BDYBAR = (BNDRYT(1)+BNDRYT(2)+BNDRYT(3)+BNDRYT(4)+BNDRYT(5)+BNDRYT(6)+BNDRYT(7)) / 7.0
+      'PM1000 is the fuel moisture from seven days ago.
+      PM1000 = MC1000(1)
+      'Calculate new value of 1000 hr fuel moisture.
+      FuelM1000Hr_prct = PM1000 + (BDYBAR-PM1000)*(1.00-0.82*EXP(-.168))
+      'Now shift the arrays of BNDRYT and MC1000 forward one day, dropping the values
+      '  from 7 days ago.
+      For i = 1 To 6
+        BNDRYT(i) = BNDRYT(i+1)
+        MC1000(i) = MC1000(i+1)
+      Next i
+      'Add new values of 24 hr boundary condition and fuel moisture to the end of arrays.
+      BNDRYT(7) = ((24.0-PPTDUR)*EMCBar + PPTDUR*(2.7*PPTDUR + 76.0))/24.0
+      MC1000(7) = FuelM1000Hr_prct 
+    EndIf
+    '--------------end fuel moisture caclulation------------
+
+    If TimeIntoInterval (0,1,Day) Then
+      ' Reset solar and precip variables at end of each day.
+      SunHourDuration = 0
+      Daylit = 0               
+      Daily_Precip_Time = 0.0  
+    EndIf

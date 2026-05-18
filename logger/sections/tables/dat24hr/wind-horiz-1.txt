@@ -1,0 +1,13 @@
+  ' RM Young 05305-AQ Horizontal Wind Speed & Direction Sensor (1)
+  Average(1,avgspd1_ms,FP2,False)  ' Avg RMY05305 (1) Wind Speed
+  Fieldnames("avgspd1")
+  Sample (1,mxgst1,FP2)  ' Max 24Hr RMY05305 (1) Wind Speed
+  Sample (1,dirgst1,FP2)  ' Max 24Hr RMY05305 (1) Direction
+  'Sample (2,HW1Max24HrTime(4),FP2)  ' Max 24Hr RMY05305 (1) time HH,MM
+  Sample(1,hhgst1,FP2)
+  Sample(1,mmgst1,FP2)
+  Sample (1,mx1gst,FP2)  'Max 1min sustained RMY05305 (1) Wind Speed
+  Sample (1,dir1gst,FP2)  'Max 1min sustained RMY05305 (1) Wind Direction
+  'Sample (2,HWTime1_max1min(4),FP2)  'Max 1min sustained RMY05305 (1) time HH,MM
+  Sample(1,hh1gst,FP2)
+  Sample(1,mm1gst,FP2)

@@ -1,0 +1,7 @@
+    If TimeIntoInterval (0,1,Day) Then
+      HWSpd2Max24Hr=0
+      HWDir2Max24Hr=0
+      HW2Max24HrTime(4)=0  'hour
+      HW2Max24HrTime(5)=0  'minute
+    EndIf
+

@@ -1,0 +1,3 @@
+    '  RM Young 27106T Wind Speed Sensor (1)
+    '  Wind Speed Sensor measurements 'w1'
+    VoltSe(w1,1,mV5000,se_wind_vert_lev1,True,0,_60Hz,0.0225,0)

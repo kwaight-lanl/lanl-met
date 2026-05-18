@@ -1,0 +1,164 @@
+'  RMYoung 05305-AQ Wind Speed & Direction Sensor (1)
+'    1H:  HWDir Signal Yellow
+'    Ground:  WSpd reference Green
+'    Ground:  Cable Shield White
+'    Ground:  WDir reference Black
+'    VX1:  HWDir Excite Blue
+'    P1:  HWspd Signal Red
+'
+'  RMYoung 05305-AQ Wind Speed & Direction Sensor (2)
+'    1L:  HWDir Signal Yellow
+'    Ground:  WSpd reference Green
+'    Ground:  Cable Shield White
+'    Ground:  WDir reference Black
+'    VX1:  HWDir Excite Blue
+'    P2:  HWspd Signal Red
+'
+'  RMYoung 05305-AQ Wind Speed & Direction Sensor (3)
+'    2H:  HWDir Signal Yellow
+'    Ground:  WSpd reference Green
+'    Ground:  Cable Shield White
+'    Ground:  WDir reference Black
+'    VX1:  HWDir Excite Blue
+'    P3:  HWspd Signal Red
+'
+'  RMYoung 05305-AQ Wind Speed & Direction Sensor (4)
+'    2L:  HWDir Signal Yellow
+'    Ground:  WSpd reference Green
+'    Ground:  Cable Shield White
+'    Ground:  WDir reference Black
+'    VX1:  HWDir Excite Blue
+'    P4:  HWspd Signal Red
+'
+'  RMYoung 27106T Wind Speed Sensor (1)
+'    3H:  VWspd Signal Red
+'    Ground:  WSpd reference Black
+'    Ground:  Cable Shield Clear?
+'
+'  RMYoung 27106T Wind Speed Sensor (2)
+'    3L:  VWspd Signal Red
+'    Ground:  WSpd reference Black
+'    Ground:  Cable Shield Clear?
+'
+'  RMYoung 27106T Wind Speed Sensor (3)
+'    4H:  VWspd Signal Red
+'    Ground:  WSpd reference Black
+'    Ground:  Cable Shield Clear?
+'
+'  RMYoung 27106T Wind Speed Sensor (4)
+'    4L:  VWspd Signal Red
+'    Ground:  WSpd reference Black
+'    Ground:  Cable Shield Clear?
+'
+'  MetOne 061 Air Temp Sensor(1) '*Note: Used for Dew Point calculation
+'    5H:  Air Temp Signal White
+'    Ground:  Air Temp reference Black
+'    Ground:  Cable shield
+'    VX2:  Excite *Wire a 18.7Kohm resistor between VX2 & 5H
+'
+'  MetOne 061 Air Temp Sensor (2)
+'    5L:  Air Temp Signal White
+'    Ground:  Air Temp reference Black
+'    Ground:  Cable shield
+'    VX2:  Excite *Wire a 18.7Kohm resistor between VX2 & 5L
+'
+'  MetOne 061 Air Temp Sensor (3)
+'    6H:  Air Temp Signal White
+'    Ground:  Air Temp reference Black
+'    Ground:  Cable shield
+'    VX2:  Excite *Wire a 18.7Kohm resistor between VX2 & 6H
+'
+'  MetOne 061 Air Temp Sensor (4)
+'    6L:  Air Temp Signal White
+'    Ground:  Air Temp reference Black
+'    Ground:  Cable shield
+'    VX2:  Excite *Wire a 18.7Kohm resistor between VX2 & 6L
+'
+'  MetOne 061 Air Temp Sensore (5)
+'    7H:  Air Temp Signal White
+'    Ground:  Air Temp reference Black
+'    Ground:  Cable shield
+'    VX2:  Excite *Wire a 18.7Kohm resistor between VX2 & 7H
+'
+'  Rotronics MP101A Air Temp & RH Sensor (constant power)
+'    7L:  Air Temperature Siganl Red(Brown)
+'    8H:  RH Signal White
+'    Ground:  Signal Ground Yellow
+'    Ground:  Power Ground Green
+'    Ground:  Cable Shield Clear?
+'    12V:  Power Blue
+'  CS100 Barometric Pressure Sensor (constant power)
+'    8L:  Baro Signal Out Blue
+'    Ground:  Signal Ground Yellow
+'    Ground:  Cable Shield Clear
+'    5V:  Sensor Enable Green
+'    G:  Power Ground Black
+'    12V:  Power Red
+'
+' Eppley PSP1 Precision Spectral Pyranometer (1) *Note: Facing UP
+'    9H:  Signal+ Green
+'    9L:  Signal- Blue
+' *Note: Jumper wire 9L -to- ground
+'    Ground:  Cable shield Clear?
+'
+' Eppley PSP2 Precision Spectral Pyranometer (2) *Note: Facing DOWN
+'    10H:  Signal+ Green
+'    10L:  Signal- Blue
+' *Note: Jumper wire 10L -to- ground
+'    Ground:  Cable shield Clear?
+'
+' Eppley PIR1 Precision Infrared Radiometer (1) *Note: Facing UP
+' Solar sensor output
+'    11H:  Solar sensor Signal+ Yellow
+'    11L:  Solar sensor Signal- Blue
+' *Note: Jumper wire 11L -to- ground
+'    Ground:  Cable shield Clear?
+' Case temperatre thermistor
+'    VX3: Excite *Wire a 1K resistor between VX3 & SE25
+'    SE25: Thermistor signal+, White
+'    Ground: Thermistor signal-, Black
+'
+' Eppley PIR2 Precision Infrared Radiometer (2) *Note: Facing DOWN
+' Solar sensor output
+'    12H:  Solar sensor Signal+ Yellow
+'    12L:  Solar sensor Signal- Blue
+' *Note: Jumper wire 12L -to- ground
+'    Ground:  Cable shield Clear?
+' Case temperatre thermistor
+'    VX3: Excite *Wire a 1K resistor between VX3 & SE27
+'    SE26: Thermistor signal+, White
+'    Ground: Thermistor signal-, Black
+'
+'  All Weather Rain Gauge wired to a control port
+'    Ground:  Cable Shield Clear?
+'    *C3:  Signal+ Red
+'     G:  Signal- Black
+' *Note: Wire 1K ohm resistor from 5V -to- C3
+'
+'  CS505 Fuel Moisture Sensor (constant power)' Replaced with CS506 9/25/2021
+'    SE27:  Signal Green
+'    Ground:  Cable Shield Clear
+'    5V:  Sensor Enable Orange
+'    G:  Power Ground Black
+'    12V:  Power Red
+'
+'CS506 Fuel Moisture Probe 'Added 9/20/2021
+'    Ground:  Clear
+'    SE27:  Signal- Green
+'    G:  Power Ground - Black
+'    C5:  Control - Orange
+'    12V:  Power (+) - Red
+
+
+'  CS205 Fuel Temperature Sensor
+'    SE27: Temp Signal Red
+'    VX4: Excite Black
+'    Ground: Purple
+'    Ground: Cable Shield, Clear
+'
+'  SR50 Snow Depth Sensor
+'     G: Power Ground Black
+'     12V: Power Red
+'     C7: Data Bus  Green
+'     C8: Sensor Enable  White
+'     G: Shield Clear

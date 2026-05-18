@@ -1,0 +1,6 @@
+    ' Datalogger Battery Voltage measurement 'BattV'
+    Battery(BattV)
+    ' Datalogger Wiring Panel Temperature measurement 'PTemp_C'
+    PanelTemp(PTemp_C,_60Hz)
+    ' Monitor exactly how high the sun voltage is being provided by the Solar Panels throughout the day.
+    VoltDiff(PVVolts,1,mV5000,d_pvvolts,True,500,60,0.01,0)

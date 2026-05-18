@@ -1,0 +1,5 @@
+  Average (1,FuelM10Hr_prct,FP2,False)
+  Minimum (1,FuelM10Hr_prct,FP2,False,False)
+  Maximum (1,FuelM10Hr_prct,FP2,False,False)
+  Average (1,FuelTempC,FP2,False)
+

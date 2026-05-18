@@ -1,0 +1,3 @@
+  Totalize(1,EppPSP1_MJm2,IEEE4,False)  'Total PSP1 flux density
+  FieldNames("EppPSP1_TOTMJm2")
+

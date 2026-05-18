@@ -1,0 +1,2 @@
+  Average (1,FuelM10Hr_prct,FP2,False)
+  Average (1,FuelTempC,FP2,False)

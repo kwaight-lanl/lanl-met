@@ -1,0 +1,22 @@
+' Return angles as degrees rather than radians, in ATN2 for example.
+AngleDegrees
+
+' RM Young 41382 Air Temp and RH
+Const se_temp_41382_lev0 = 7
+Const se_rh_41382_lev0 = 8
+Const se_temp_41382_lev1 = 9
+Const se_rh_41382_lev1 = 10
+' RM Young 05305-AQ Horizontal Wind Speed & Direction Sensor
+Const p_wind_horiz_lev1 = 1
+Const se_wind_horiz_lev1 = 1
+' RM Young 27106T Vertical Wind Speed Sensor
+Const se_wind_vert_lev1 = 5
+' RM Young Model 81000 Ultrasonic 3D Anemometer.
+Const se_wind_81000_u = 11
+Const se_wind_81000_v = 12
+Const se_wind_81000_w = 13
+Const se_wind_81000_t = 14
+' Battery and aspiration fans.
+Const d_pvvolts = 2
+Const p_fan_lev0 = 3
+Const p_fan_lev1 = 4

@@ -1,0 +1,49 @@
+    '################## ADD CSAT3B MEASUREMENT INSTRUCTIONS ###################
+    ' CSI CSAT3B
+    CSAT3B (CSATVals(),0,3,0)
+
+    'Copy and convert CSAT3B for compass wind vector computation.
+    wind_east = -1*Uy
+    wind_north = Ux
+
+    'Break up the warning flags into separate bits.
+    diag_integer = Diag
+    diag_bits(1) = diag_integer AND &h00000001
+    diag_bits(2) = diag_integer AND &h00000002
+    diag_bits(3) = diag_integer AND &h00000004
+    diag_bits(4) = diag_integer AND &h00000008
+    diag_bits(5) = diag_integer AND &h00000010
+    diag_bits(6) = diag_integer AND &h00000020
+    diag_bits(7) = diag_integer AND &h00000040
+    diag_bits(8) = diag_integer AND &h00000080
+    diag_bits(9) = diag_integer AND &h00000100
+
+    'Turn on this intermediate processing disable flag when any
+    'warning flag is set or the data returned is NaN
+    disable_stats(1) = ((diag_integer AND &hffffffff) OR (Diag = NaN))
+    'Turn on this intermediate processing disable flag only when
+    'CSAT3B diagnostic warning flags are set
+    disable_stats(2) = ((diag_integer AND &hffffffff) AND NOT (Diag = NaN))
+
+    'Compute the online wind vector statistics.
+    CallTable DataWindVec
+
+    If (DataWindVec.Output(1,1) ) Then
+      GetRecord (wind_out(1),DataWindVec,1)
+      'Compass wind direction will be 0 to 360 degrees.
+      dirCSAT = (dirCSAT+CSAT_AZIMUTH) MOD 360
+      'CSAT wind direction will be 0 to 180 or 0 to -180 degrees.
+      If ( wind_dir_csat ) > 180 Then ( wind_dir_csat = wind_dir_csat-360 )
+    EndIf
+
+    CallTable DataStats
+
+    '----------------------------------------------------------
+    ' Read Time every 1minute ---------------------------------
+    If TimeIntoInterval (0,1,Min) Then
+      RealTime (HWTime1_1min())
+    EndIf
+    '
+
+    CallTable(CSAT3BSonicData)
+    CallTable(CSAT3BMonitorData)

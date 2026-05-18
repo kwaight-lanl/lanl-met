@@ -1,0 +1,2 @@
+  Totalize(1,Rain_inch,FP2,False)  'Total AW60103 rain
+  FieldNames("Rain_TOTinch")

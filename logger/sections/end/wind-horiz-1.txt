@@ -1,0 +1,14 @@
+    ' RM Young 05305-AQ Wind Speed & Direction Sensor (1)
+    ' At the beginning of a new day reset 24Hr variables
+    If TimeIntoInterval (0,1,Day) Then
+      mx1gst = 0
+      dir1gst = 0
+      HWTime1_max1min(4) = 0
+      HWTime1_max1min(5) = 0
+
+      mxgst1=0
+      dirgst1=0
+      HW1Max24HrTime(4)=0  'hour
+      HW1Max24HrTime(5)=0  'minute
+      MaxGustToday=0
+    EndIf

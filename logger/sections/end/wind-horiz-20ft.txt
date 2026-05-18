@@ -1,0 +1,8 @@
+    CallTable Dat10min
+    If TimeIntoInterval (0,1,Day) Then
+      WSpd20ft_max24Hr=0
+      WDir20ft_max24Hr=0
+      WSpd20ft_max24HrTime(4)=0  'hour
+      WSpd20ft_max24HrTime(5)=0  'minute
+    EndIf
+

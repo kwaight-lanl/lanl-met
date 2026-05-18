@@ -1,0 +1,2 @@
+DataTable(Dat24Hr,True,-1)
+  DataInterval(0,24,Hr,10)

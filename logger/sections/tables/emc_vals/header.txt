@@ -1,0 +1,2 @@
+DataTable(EMC_Vals,True,30)  '*Note: data table size fixed to 48 records
+  DataInterval(1438,1440,min,10)'MH 10/18 changed timeinto interval to 1438 so values are available for calculations at 1439)

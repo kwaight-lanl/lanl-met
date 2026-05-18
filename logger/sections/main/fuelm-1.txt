@@ -1,0 +1,20 @@
+    ' Source of previous calculation of EMC and 1 hr fuel moisture is unknown, so
+    '   switched to calculations from Cohen and Deeming reference instead. 
+    '   The differences in 1 hr fuel moisture were found to be small.
+    ' December 2021 - Ken Waight
+
+    ' New calculation of EMC and 1 hr fuel moisture.
+    ' Cohen, J.D. and J.E. Deeming, 1982?: The National Fire Danger Rating System: basic equations. 
+    '   General Technical Report PSW-82, U.S. Forest Service, Pacific Southwest Forest and Range
+    '   Experimental Station.
+    ' December 2021 - Ken Waight
+    AirTemp1_DegF = (1.8*temp0)+32
+    If rh0 < 10 Then
+      EMC = 0.03229 + 0.281073*rh0 - 0.000578*AirTemp1_DegF*rh0
+    ElseIf rh0>=10 AND rh0 < 50 Then
+      EMC = 2.22749 + 0.160107*rh0 - 0.014784*AirTemp1_DegF
+    ElseIf rh0>= 50 Then
+      EMC = 21.0606 + 0.005565*rh0*rh0 - 0.00035*rh0*AirTemp1_DegF - 0.483199*rh0
+    EndIf
+    FuelM1Hr_prct = (4.12*EMC+FuelM10Hr_prct)/5.0
+

@@ -1,0 +1,34 @@
+'  RMYoung 05305-AQ Wind Speed & Direction Sensor (1)
+'    1H:  HWDir Signal Yellow
+'    Ground:  WSpd reference Green
+'    Ground:  Cable Shield White
+'    Ground:  WDir reference Black
+'    VX1:  HWDir Excite Blue
+'    P1:  HWspd Signal Red
+'
+'  RMYoung 27106T Wind Speed Sensor (1)
+'    3H:  VWspd Signal Red
+'    Ground:  WSpd reference Black
+'    Ground:  Cable Shield Clear?
+'
+'  MetOne 060A2 Air Temp Sensor(1)
+'    5H:  Air Temp Signal white
+'    Ground:  Air Temp reference black
+'    Ground:  Cable shield color?
+'    VX2:  Excite *Wire a 23.1Kohm resistor between VX2 & 5H
+'
+'  MetOne 060A2 Air Temp Sensor (2)
+'    5L:  Air Temp Signal white
+'    Ground:  Air Temp reference black
+'    Ground:  Cable shield color?
+'    VX2:  Excite *Wire a 23.1Kohm resistor between VX2 & 5L
+'
+' Eppley PSP1 Precision Spectral Pyranometer (1)
+'    9H:  Signal+ Green
+'    9L:  Signal- Blue
+' *Note: Jumper wire 9L -to- ground
+'    Ground:  Cable shield yellow
+'
+' Eppley PSP1 Precision Spectral Pyranometer (1)
+'    C1: Fan On-Off Control
+'    C2: Heater On-Off Control

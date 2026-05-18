@@ -1,0 +1,4 @@
+  Average(1,BattV,FP2,False)
+  Average(1,PTemp_C,FP2,False)
+  FieldNames("PTemp_AVGDegC")
+  Average(1,PVVolts,FP2,False)

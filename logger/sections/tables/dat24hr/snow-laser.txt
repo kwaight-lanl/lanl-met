@@ -1,0 +1,3 @@
+  'SDMS40 Laser Snow Sensor
+  Sample (1,Midnt_snow_in,FP2)
+  FieldNames("Midnight_snow_depth_in")

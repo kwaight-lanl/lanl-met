@@ -1,0 +1,3 @@
+Public AirTemp1_DegF
+Public EMC, FuelM1Hr_prct
+Units FuelM1Hr_prct=%

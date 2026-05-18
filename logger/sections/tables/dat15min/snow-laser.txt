@@ -1,0 +1,3 @@
+  'SDMS40 Laser Snow Sensor
+  Average(1,SnowDepth_in_Avg,FP2,False)
+  FieldNames("SnowDepth_in_Avg")

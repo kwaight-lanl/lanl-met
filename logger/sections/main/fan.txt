@@ -1,0 +1,2 @@
+    PulseCount (FanLvl1_Hz,1,p_fan_lev0,0,1,1,0)
+    PulseCount (FanLvl2_Hz,1,p_fan_lev1,0,1,1,0)

@@ -1,0 +1,4 @@
+DataTable(Dat1min,True,48)  '*Note: data table size fixed to 48 records
+  DataInterval(0,1,Min,10)
+  ' This table is used to compute speed, direction and time of max sustained
+  '    1min gust.

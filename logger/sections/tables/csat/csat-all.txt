@@ -1,0 +1,65 @@
+
+'Define & Set up CSAT3B Data Tables.
+DataTable (CSAT3BSonicData,1,-1)
+  Sample (5,CSATVals(1),IEEE4)
+EndTable
+'
+'
+DataTable (CSAT3BMonitorData,1,-1)
+  DataInterval (0,3,Sec,10)
+  Sample (4,CSATMonitorVals(1),IEEE4)
+  '
+EndTable
+
+DataTable (DataWindVec,TRUE,1)
+  DataInterval (0,STATS_INTERVAL,Min,2)
+  'Compute wind direction from CSAT data.
+  WindVector (1,wind_east,wind_north,IEEE4,disable_stats(1),0,1,2)
+  WindVector (1,Uy,Ux,IEEE4,disable_stats(1),0,1,2)
+  '  'Compute Wind Dirrection from RMY81000
+  WindVector (1,WSpd81000,WDir81000,IEEE4,False,0,1,2)
+
+EndTable
+
+' Statistics data.
+DataTable (DataStats,TRUE,-1)
+  DataInterval (0,STATS_INTERVAL,Min,2)
+  Average (1,Ts,IEEE4,disable_stats(1))
+  StdDev  (1,Ts,IEEE4,disable_stats(1))
+  Average (1,WSpd81000,IEEE4,False)
+  StdDev (1,WSpd81000,IEEE4,False)
+  '  Average (1,Ux,IEEE4,disable_stats(1))
+  '  StdDev  (1,Ux,IEEE4,disable_stats(1))
+  '  Average (1,Uy,IEEE4,disable_stats(1))
+  '  StdDev  (1,Uy,IEEE4,disable_stats(1))
+  '  Average (1,Uz,IEEE4,disable_stats(1))
+  '  StdDev  (1,Uz,IEEE4,disable_stats(1))
+
+  Sample (1,dirCSAT,IEEE4)
+  Sample (1,wind_dir_csat,IEEE4)
+  Sample (1,spdCSAT,IEEE4)
+  Sample (1,result_wind_speed,IEEE4)
+  Sample (1,standard_wind_dir,IEEE4)
+
+  Totalize (1,N_STATS,IEEE4,disable_stats(1))
+  Totalize (1,N_STATS,IEEE4,NOT (disable_stats(1) OR disable_stats(2)))
+  FieldNames ("csat_warnings")
+  Totalize (1,N_STATS,IEEE4,NOT (Flag_LowAmp) OR NOT (disable_stats(2)))
+  FieldNames ("Flag_LowAmp_Tot")
+  Totalize (1,N_STATS,IEEE4,NOT (Flag_HighAmp) OR NOT (disable_stats(2)))
+  FieldNames ("Flag_HighAmp_Tot")
+  Totalize (1,N_STATS,IEEE4,NOT (Flag_Tracking) OR NOT (disable_stats(2)))
+  FieldNames ("Flag_Tracking_Tot")
+  Totalize (1,N_STATS,IEEE4,NOT (Flag_HighDeltaC) OR NOT (disable_stats(2)))
+  FieldNames ("Flag_HighDeltaC_Tot")
+  Totalize (1,N_STATS,IEEE4,NOT (Flag_Acq) OR NOT (disable_stats(2)))
+  FieldNames ("Flag_Acq_Tot")
+  Totalize (1,N_STATS,IEEE4,NOT (Flag_LowVolt) OR NOT (disable_stats(2)))
+  FieldNames ("Flag_LowVolt_Tot")
+  Totalize (1,N_STATS,IEEE4,NOT (Flag_MemErr) OR NOT (disable_stats(2)))
+  FieldNames ("Flag_MemErr_Tot")
+  Totalize (1,N_STATS,IEEE4,NOT (Flag_ADCSkip) OR NOT (disable_stats(2)))
+  FieldNames ("Flag_ADCSkip_Tot")
+  Totalize (1,N_STATS,IEEE4,NOT (Flag_TrigErr) OR NOT (disable_stats(2)))
+  FieldNames ("Flag_TrigErr_Tot")
+'EndTable  ' Comment out this EndTable because one is added automatically.

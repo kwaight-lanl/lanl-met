@@ -1,0 +1,2 @@
+DataTable (Public15,True,1)
+  DataInterval (0,15,Min,10)

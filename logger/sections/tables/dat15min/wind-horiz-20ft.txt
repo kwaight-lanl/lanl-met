@@ -1,0 +1,2 @@
+  WindVector (1,WSpd20ft,WDir20ft,FP2,False,0,0,1)  'RMY05305 (1) Sensor
+  FieldNames("WSpd20ft_Avg,WDir20ft_Avg")

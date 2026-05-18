@@ -1,0 +1,7 @@
+'SDMS40 Laser Snow Sensor
+Dim SDMS40_Cal_Ret
+Public SDMS40_Cal_Now = False
+Public SnowDepth_in_Avg
+Units SnowDepth_in_Avg=in
+Public Midnt_snow_in
+Units Midnt_snow_in = inch

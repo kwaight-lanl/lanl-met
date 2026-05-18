@@ -1,0 +1,7 @@
+  ' RM Young 05305-AQ Horizontal Wind Speed & Direction Sensor (1)
+  WindVector (1,avgspd1_ms,HWDir1_deg,FP2,False,0,0,0)  'RMY05305 (1) Sensor
+  FieldNames("spd1,dir1,sddir1")
+  StdDev (1,avgspd1_ms,FP2,False)'StdDev RMY05305 (1) Sensor
+  FieldNames("sdspd1")
+  ' Calculate max level 1 wind speed over 15 min, used for MaxGustToday calculation.
+  Maximum (1,avgspd1_ms,FP2,avgspd1_ms=NAN,False)

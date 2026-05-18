@@ -1,0 +1,102 @@
+'
+'CR3000 Datalogger
+'----------------------
+'-------Header---------
+'----------------------
+'
+'Title/Name:  TA54B-CR3000-V1.CRS 
+' 
+'
+' Notice: Requires Compilation in PipeLineMode for CSAT3B Ultrsonic Anemometer
+'################################################################################
+'########## Program Comments & Notes###########Program Comments & Notes#########
+'################################################################################
+'###############################################################################
+'
+'--------------------------------------------------
+' -----------------Revision History----------------
+' -------------------------------------------------
+' January 16, 2024 gts Renamed Program to coincide with Software Quality Procedure.
+'
+'
+'
+'
+'
+'Date:June 9th, 2021 GTStanton
+'Updated program data labels as follows
+  'For 15-Min Data Table
+      'HWDir1_StdDev  to sddir1
+  'HWSpd1-ms-StdDev to sdspd1
+  '
+  'For 24-Hr Data Table
+  'HWSpd1-ms-Avg  to  avgspd1
+  'For above need to change root tag/label from "HWSpd1" to "avgspd1"
+'
+'
+' _6gts_11-10-2020 went through program and removed excess items carried over from
+'example programs of MetTestStation & TA5MDCN to minimize confusion & Transferred in
+' notes from Robert Carpenters work on initial purchase request Feb 25, 2020 for program.
+'
+'
+'
+' Sensors Installed:
+' 1-RM Young 05305AQ Horizontal Anemometers
+' 1-RM Young 27106T Gill Anemometer [Vertical Wind Speed Config.]
+' 2-RMYoung 43347-41432 Temp Sensor w/Aspiration Fans
+' 1-CSI Model CSAT3B Ultrasonic Anemometer.
+' 1-RM Young Model 81000 Ultrasonic 3D Anemometer.
+' 1-CSI Leaf Sensor
+'
+'NOTES FROM ROBERT CARPENTER MODIFICATIONS FOR INITIAL PROGRAM FEB 25, 2020
+'Changes to this version:
+'  1.Added the instruction to measure a CSAT3B sensor.  All coding (i.e.
+'    Variable names, measurement instructions, data types) were ported over
+'    from a program named MetTestStationRev_4_10012019.CR3. Both the sample
+'    program, MetTestStationRev_4_10012019 and the proram that was to be
+'    added to, TA5 MDCN_V4.CR3 were provided by Gregory T Stanton.
+'    ##### Though every effort to make sure this new program functions as
+'          it has been requested, the data from this new program should be
+'          closely reviewed for accuracy before proceeding with any long
+'          term testing.#####
+'  2. See wiring instructions for the CSAT3B below.
+'  3. Changed from SequentialMode to PipeLineMode
+'  4. Added instructions to measure the RPM of the fan on the 43502
+'     aspirated radiation shield and added the output to the 15 minute
+'     data table.
+'  5. Replaced the 060A2 air temp sensors with the RM Young 43347 air temp
+'     sensor and added the output to the 15 minute data table.
+'  6. Added the CSI Leaf Wetness sensor and added the output to the 15
+'     minute data table.
+'  7. Added more output instructions to the 15 minute data table for the
+'     Battery Voltage measurement.
+'  8. Added more output instructions to the 15 minute data table for the
+'     RM Young 05305AQ anemometer.
+'  9. Added more output instructions to the 15 minute data table for the
+'     RM Young 27106T Vertical anemometer.
+'  10. Deleted/Removed all instructions pertaining to the Eppley 8-48
+'      sensor.
+'  11. Corrected the wiring description listed below, and before the program
+'      starts, to match the measureemnt instruction in the program. Some of
+'      the channel assigments did not match.  This new version should be
+'      used for wiring up the new sensors.
+'  12. Added the instruction to include the RM Young 81000 3D sonic with
+'      Serial Output. The sensor is connected to 12V, G and Com4 (C7&C8).
+'      Program example from Knowledge Base
+'SET PARAMETERS (RMY81000 firmware 7.0.05)
+'A) AVERAGING = 0
+'B) BAUD = 38400
+'E) ERROR HANDLING = INCLUDE INVALID DATA
+'N) SCALING MULT = NA
+'O) OUTPUT RATE = 32 Hz
+'P) POLL CHARACTER (ADDR) = NA
+'S) SER OUT FORMAT = CUSTOM - UVW, Ts, ERR CODE, CHKSUM
+'T) THRESHOD = 20
+'U) UNITS = m/s
+'V) V OUT FORMAT = NA
+'W) WAKE CORRECTION = YES
+'
+'program change on 11/13/2020
+'81000 readings appear to be swapped, cannot lower tower to verify wiring so this revision will swap:
+'SE11 and SE12 for the VoltSE measurements with respect to Wind Speed and Wind Direction
+'SE13 and SE14 for the VoltSE measurements with respect to the Elevation and Temperature
+'also uncommented the Ux, Uy and Uz section of the 15 minute table so those values can be recorded

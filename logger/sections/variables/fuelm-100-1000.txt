@@ -1,0 +1,19 @@
+'New variables added for fuel moisture, 10/12/2021, Ken Waight from Mike Hansen's changes
+Public SunHourDuration   ' minutes of daylight in the current day
+Public Daylit            ' number of daylight hours in the current day
+Public Daily_Precip_Time ' minutes of precip in the current day
+Public PPTDUR            ' number of hours of precip in previous 24 Hours
+Public Sun As Boolean
+Public FuelM100Hr_Yest 
+Public BNDRYH
+Public EMCBar
+Public FuelM100Hr_prct
+Public FuelM1000Hr_prct
+Public MC1000(7)
+Public PM1000, BDYBAR
+Public AirTemp1_DegF
+Public BNDRYT(7) 
+Units FuelM100Hr_prct=%
+Units FuelM1000Hr_prct=%
+
+

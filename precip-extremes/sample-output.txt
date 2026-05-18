@@ -1,0 +1,209 @@
+
+Chow et al. example calculations:
+ Annual maximums: 0.49 0.66 0.36 0.58 0.41 0.47 0.74 0.53 0.76 0.57 0.80 0.66 0.68 0.68 0.61 0.88 0.49 0.33 0.96 0.94 0.80 0.62 0.71 1.11 0.64 0.52 0.64 0.34 0.70 0.57 0.92 0.66 0.65 0.63 0.60
+    Mean:  0.649, Std. Dev.:  0.177
+    5 years:
+       10 min:  0.78 in,  4.66 in/hr
+    10 years:
+       10 min:  0.88 in,  5.28 in/hr
+    50 years:
+       10 min:  1.11 in,  6.65 in/hr
+
+Least squares curve fitting example calculations:
+`ftol` termination condition is satisfied.
+Function evaluations 131, initial cost 4.4383e+00, final cost 1.5375e-04, first-order optimality 4.52e-08.
+Parameters from curve fitting example: [0.192806   0.19130332 0.12306046 0.13607205]
+
+LANL Calculations:
+
+Reading precip file: precip-ta6.csv
+
+Build list of all possible 15 min times:
+
+Calculate how much data is present for each year:
+    1990  90.1% of 15 min data present
+    1991  98.8% of 15 min data present
+    1992  99.4% of 15 min data present
+    1993  98.7% of 15 min data present
+    1994  99.7% of 15 min data present
+    1995  99.8% of 15 min data present
+    1996  99.7% of 15 min data present
+    1997  100.0% of 15 min data present
+    1998  100.0% of 15 min data present
+    1999  99.7% of 15 min data present
+    2000  92.3% of 15 min data present
+    2001  100.0% of 15 min data present
+    2002  100.0% of 15 min data present
+    2003  100.0% of 15 min data present
+    2004  100.0% of 15 min data present
+    2005  100.0% of 15 min data present
+    2006  99.5% of 15 min data present
+    2007  95.3% of 15 min data present
+    2008  100.0% of 15 min data present
+    2009  100.0% of 15 min data present
+    2010  100.0% of 15 min data present
+    2011  99.2% of 15 min data present
+    2012  99.9% of 15 min data present
+    2013  99.8% of 15 min data present
+    2014  100.0% of 15 min data present
+    2015  99.6% of 15 min data present
+    2016  99.9% of 15 min data present
+    2017  100.0% of 15 min data present
+    2018  99.9% of 15 min data present
+
+Add 15-min values to calculate precip over longer durations:
+    30 min
+    45 min
+    60 min
+    75 min
+    90 min
+    105 min
+    120 min
+
+To get the Partial Duration Series (PDS), accumulate the highest precip values:
+   First data: 1990-02-01 00:15:00 
+   Last data: 2018-12-31 23:45:00 
+   Number of years:  28.9 
+   Integer number of years: 28 
+   frequency:  1.0
+    15 min:
+
+Writing output csv file: precipRecurrenceData.csv
+      Fit Beta-P extreme value distribution to PDS:
+        alpha:  0.15, beta:  0.46, theta:  29.30
+plug a set of return periods
+        2 years:  0.53 in,  2.11 in/hr
+        5 years:  0.65 in,  2.58 in/hr
+        10 years:  0.75 in,  3.01 in/hr
+        25 years:  0.92 in,  3.69 in/hr
+        50 years:  1.08 in,  4.30 in/hr
+        100 years:  1.25 in,  5.01 in/hr
+    30 min:
+      Fit Beta-P extreme value distribution to PDS:
+        alpha:  0.15, beta:  0.69, theta:  28.79
+plug a set of return periods
+        2 years:  0.81 in,  1.62 in/hr
+        5 years:  1.01 in,  2.02 in/hr
+        10 years:  1.19 in,  2.39 in/hr
+        25 years:  1.48 in,  2.97 in/hr
+        50 years:  1.75 in,  3.50 in/hr
+        100 years:  2.07 in,  4.13 in/hr
+    45 min:
+      Fit Beta-P extreme value distribution to PDS:
+        alpha:  0.47, beta:  0.84, theta:  9.36
+plug a set of return periods
+        2 years:  0.95 in,  1.27 in/hr
+        5 years:  1.20 in,  1.60 in/hr
+        10 years:  1.41 in,  1.88 in/hr
+        25 years:  1.73 in,  2.31 in/hr
+        50 years:  2.02 in,  2.70 in/hr
+        100 years:  2.37 in,  3.16 in/hr
+    60 min:
+      Fit Beta-P extreme value distribution to PDS:
+        alpha:  0.38, beta:  0.89, theta:  11.46
+plug a set of return periods
+        2 years:  1.02 in,  1.02 in/hr
+        5 years:  1.28 in,  1.28 in/hr
+        10 years:  1.51 in,  1.51 in/hr
+        25 years:  1.86 in,  1.86 in/hr
+        50 years:  2.19 in,  2.19 in/hr
+        100 years:  2.57 in,  2.57 in/hr
+    75 min:
+      Fit Beta-P extreme value distribution to PDS:
+        alpha:  0.33, beta:  0.93, theta:  12.87
+plug a set of return periods
+        2 years:  1.07 in,  0.86 in/hr
+        5 years:  1.35 in,  1.08 in/hr
+        10 years:  1.59 in,  1.27 in/hr
+        25 years:  1.97 in,  1.58 in/hr
+        50 years:  2.33 in,  1.86 in/hr
+        100 years:  2.74 in,  2.19 in/hr
+    90 min:
+      Fit Beta-P extreme value distribution to PDS:
+        alpha:  0.16, beta:  0.91, theta:  23.62
+plug a set of return periods
+        2 years:  1.08 in,  0.72 in/hr
+        5 years:  1.37 in,  0.91 in/hr
+        10 years:  1.63 in,  1.09 in/hr
+        25 years:  2.07 in,  1.38 in/hr
+        50 years:  2.47 in,  1.65 in/hr
+        100 years:  2.96 in,  1.97 in/hr
+    105 min:
+      Fit Beta-P extreme value distribution to PDS:
+        alpha:  0.20, beta:  0.94, theta:  20.42
+plug a set of return periods
+        2 years:  1.11 in,  0.64 in/hr
+        5 years:  1.40 in,  0.80 in/hr
+        10 years:  1.67 in,  0.95 in/hr
+        25 years:  2.10 in,  1.20 in/hr
+        50 years:  2.49 in,  1.43 in/hr
+        100 years:  2.97 in,  1.70 in/hr
+    120 min:
+      Fit Beta-P extreme value distribution to PDS:
+        alpha:  0.19, beta:  0.96, theta:  20.67
+plug a set of return periods
+        2 years:  1.14 in,  0.57 in/hr
+        5 years:  1.44 in,  0.72 in/hr
+        10 years:  1.71 in,  0.85 in/hr
+        25 years:  2.15 in,  1.08 in/hr
+        50 years:  2.56 in,  1.28 in/hr
+        100 years:  3.05 in,  1.53 in/hr
+
+To get the AMS, calculate the maximum precip for each year:
+    15 min:
+       0.54 0.89 0.41 0.45 0.38 0.42 0.33 0.47 0.30 0.47 0.30 0.46 0.56 0.39 0.52 0.61 0.54 0.52 0.54 0.30 0.43 0.67 0.40 0.73 0.79 0.61 0.33 0.38 0.35
+           Mean:  0.486, Std. Dev.:  0.149
+      Fit Beta-P extreme value distribution to AMS:
+       1 years:  0.43 in,  1.70 in/hr
+    30 min:
+       0.82 1.21 0.70 0.70 0.40 0.47 0.62 0.65 0.49 0.49 0.37 0.65 0.76 0.59 0.78 0.83 0.89 0.77 0.84 0.42 0.69 1.18 0.53 1.39 1.37 0.88 0.51 0.48 0.42
+           Mean:  0.721, Std. Dev.:  0.278
+      Fit Beta-P extreme value distribution to AMS:
+       1 years:  0.60 in,  1.21 in/hr
+    45 min:
+       0.97 1.33 0.98 0.76 0.41 0.54 0.75 0.76 0.75 0.52 0.42 0.72 0.78 0.75 0.87 1.04 1.06 0.77 1.03 0.45 0.98 1.34 0.54 1.73 1.46 0.91 0.58 0.51 0.48
+           Mean:  0.834, Std. Dev.:  0.328
+      Fit Beta-P extreme value distribution to AMS:
+       1 years:  0.70 in,  0.93 in/hr
+    60 min:
+       1.25 1.34 1.06 1.00 0.42 0.61 0.77 0.80 0.92 0.52 0.52 0.75 0.81 0.79 0.90 1.21 1.16 0.79 1.04 0.52 1.04 1.48 0.60 1.91 1.46 0.91 0.59 0.57 0.51
+           Mean:  0.905, Std. Dev.:  0.354
+      Fit Beta-P extreme value distribution to AMS:
+       1 years:  0.76 in,  0.76 in/hr
+    75 min:
+       1.38 1.35 1.12 1.08 0.43 0.64 0.80 1.02 0.96 0.56 0.57 0.78 0.86 0.84 0.91 1.26 1.31 0.82 1.04 0.56 1.13 1.60 0.60 2.07 1.46 0.91 0.59 0.62 0.52
+           Mean:  0.958, Std. Dev.:  0.380
+      Fit Beta-P extreme value distribution to AMS:
+       1 years:  0.80 in,  0.64 in/hr
+    90 min:
+       1.40 1.35 1.20 1.14 0.43 0.65 0.84 1.18 0.99 0.61 0.58 0.81 0.88 0.87 0.92 1.27 1.35 0.83 1.04 0.57 1.17 1.63 0.60 2.22 1.46 0.91 0.60 0.63 0.52
+           Mean:  0.988, Std. Dev.:  0.400
+      Fit Beta-P extreme value distribution to AMS:
+       1 years:  0.82 in,  0.55 in/hr
+    105 min:
+       1.40 1.35 1.24 1.16 0.48 0.65 0.88 1.25 1.00 0.72 0.59 0.82 1.13 0.88 0.95 1.27 1.48 0.83 1.04 0.63 1.18 1.64 0.60 2.28 1.46 0.92 0.61 0.71 0.53
+           Mean:  1.023, Std. Dev.:  0.402
+      Fit Beta-P extreme value distribution to AMS:
+       1 years:  0.85 in,  0.49 in/hr
+    120 min:
+       1.40 1.35 1.25 1.17 0.54 0.67 0.91 1.26 1.02 0.86 0.59 0.84 1.33 0.89 0.97 1.27 1.58 0.83 1.04 0.63 1.34 1.70 0.60 2.34 1.46 0.93 0.61 0.77 0.53
+           Mean:  1.058, Std. Dev.:  0.414
+      Fit Beta-P extreme value distribution to AMS:
+       1 years:  0.88 in,  0.44 in/hr
+
+Writing output csv file: precipExtremes.csv
+
+Illustration of a Beta-P curve:
+   duration: 15
+   omega: 0.96846590909
+   alpha, beta, theta: 0.15397971 0.455051 29.30487937
+        2 years:  0.53 in,  2.11 in/hr
+        5 years:  0.65 in,  2.58 in/hr
+        10 years:  0.75 in,  3.01 in/hr
+        25 years:  0.92 in,  3.69 in/hr
+        50 years:  1.08 in,  4.30 in/hr
+        100 years:  1.25 in,  5.01 in/hr
+
+INFO: Number of flagged precip values: 9786 (1.0%)
+
+Completed.

@@ -1,0 +1,6 @@
+Public FuelM10Hr_uS
+Public FuelM10Hr_prct
+Public FuelTempC
+Units FuelM10Hr_uS=microSec
+Units FuelM10Hr_prct=%
+Units FuelTempC=DegC

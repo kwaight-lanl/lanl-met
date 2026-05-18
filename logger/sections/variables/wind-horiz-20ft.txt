@@ -1,0 +1,5 @@
+Public WSpd20ft
+Public WDir20ft
+Units WSpd20ft=meters/second
+Units WDir20ft=degrees
+Public WSpd20ft_max24Hr, WDir20ft_max24Hr, WSpd20ft_max24HrTime(9)

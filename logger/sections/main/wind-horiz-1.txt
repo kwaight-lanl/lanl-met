@@ -1,0 +1,41 @@
+    ' RM Young 05305-AQ Wind Speed & Direction Sensor (1)
+    '  avgspd1_ms' and 'HWDir1_deg'
+    PulseCount(avgspd1_ms,1,p_wind_horiz_lev1,1,1,0.1024,0)
+    BrHalf(HWDir1_deg,1,mV5000,se_wind_horiz_lev1,1,1,5000,True,0,_60Hz,355,0)
+    If HWDir1_deg>=360 OR HWDir1_deg<0 Then HWDir1_deg=0
+
+    ' Determine the HWSpeed, Direction & Time of Max Gust 4-levels
+    ' for a 24Hr period
+    If avgspd1_ms > mxgst1 Then
+      mxgst1 = avgspd1_ms
+      dirgst1 = HWDir1_deg
+      RealTime (HW1Max24HrTime())
+      hhgst1 = HW1Max24HrTime(4)
+      mmgst1 = HW1Max24HrTime(5)
+    EndIf
+
+    ' Read Time every 1minute ---------------------------------
+    If TimeIntoInterval (0,1,Min) Then
+      RealTime (HWTime1_1min())
+    EndIf
+
+    ' Redirect DatTable "Dat1min" variables to program variables ----------
+    avgspd1_1min = Dat1min.avgspd1_ms_WVc(1,1)
+    HWDir1_1min = Dat1min.avgspd1_ms_WVc(2,1)
+
+    ' Determine the HWSpeed, HWDirection & Time of Max 1min sustained gust 1-level
+    ' for a 24Hr period and store into program variables for a 24Hr period
+    If avgspd1_1min > mx1gst Then
+      mx1gst = avgspd1_1min
+      dir1gst = HWDir1_1min
+      'HWTime1_max1min(4) = HWTime1_1min(4)
+      'HWTime1_max1min(5) = HWTime1_1min(5)
+      hh1gst = HWTime1_1min(4)
+      mm1gst = HWTime1_1min(5)
+    EndIf
+
+    If IfTime(0,15,min) Then
+      If Dat15Min.avgspd1_ms_MAX>MaxGustToday Then
+        MaxGustToday=Dat15Min.avgspd1_ms_MAX
+      EndIf
+    EndIf

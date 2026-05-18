@@ -1,0 +1,2 @@
+'SDMS40 Laser Snow Sensor
+Const sdi_snow = 1

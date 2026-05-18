@@ -1,0 +1,8 @@
+  ' RM Young Model 81000 Ultrasonic 3D Anemometer.
+  StdDev(1,spd81000,FP2,False) 'StdDev RMY27106T (1) Wind Speed
+  WindVector (1,spd81000,dir81000,FP2,False,0,0,1) 
+  FieldNames("spd81000,dir81000")
+  Average (1,w81000,FP2,False)
+  FieldNames ("w81000")
+  StdDev(1,w81000,FP2,False)
+  fieldnames ("sdw81000")

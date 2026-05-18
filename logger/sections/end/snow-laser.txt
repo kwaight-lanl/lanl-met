@@ -1,0 +1,6 @@
+    ' Capture snow depth at midnight for the 24 hr table.
+    If IfTime(0,24,Hr) Then
+      'Midnt_snow_in=Dat15min.SnowDepth_in_Avg
+      'Problem compiling above line, instantaneous snow value may be OK below.
+      Midnt_snow_in=SnowDepth_in_Avg
+    EndIf

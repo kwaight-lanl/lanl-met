@@ -1,0 +1,4 @@
+Public FanLvl1_Hz
+Public FanLvl2_Hz
+Units FanLvl1_Hz=Hz
+Units FanLvl2_Hz=Hz 

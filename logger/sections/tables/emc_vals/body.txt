@@ -1,0 +1,7 @@
+  Maximum (1,temp0,FP2,False,False)
+  SampleMaxMin (1,EMC,FP2,False)
+  FieldNames ("EMCMin")
+  Minimum (1,temp0,FP2,False,False)
+  SampleMaxMin (1,EMC,FP2,False)
+  FieldNames ("EMCMax")
+  'ktw: This is not necessary after changes? Sample (1,BNDRYT,FP2)

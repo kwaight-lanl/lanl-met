@@ -1,0 +1,62 @@
+Const STATS_INTERVAL = 5    'Period of 30 min for online statistics
+Const N_STATS = 1           'Increment size in the totalization functions
+Public CSATVals(5)
+Public CSATMonitorVals(4)
+Alias CSATVals(1) = Ux 'X-Axis wind speed in m/s
+Alias CSATVals(2) = Uy 'Y-Axis Wind Speed in m/s
+Alias CSATVals(3) = Uz 'Z-Axix Wind Speed in m/s
+Alias CSATVals(4) = Ts 'Sonic Temperature in Deg. C
+Alias CSATVals(5) = Diag 'Diagnostic Word
+Alias CSATMonitorVals(1) = BoardTemp
+Alias CSATMonitorVals(2) = BoardHumidity
+Alias CSATMonitorVals(3) = InclinePitch
+Alias CSATMonitorVals(4) = InclineRoll
+Units Ux      = m/s
+Units Uy      = m/s
+Units Uz      = m/s
+Units Ts      = degC
+Units Diag    = unitless
+Units BoardTemp     = degC
+Units BoardHumidity = percent
+Units InclinePitch  = deg
+Units InclineRoll   = deg
+'CSAT3B diagnostic flags
+Public diag_bits(9) As Boolean
+Alias diag_bits(1) = Flag_LowAmp       'Low Amplitude Flag
+Alias diag_bits(2) = Flag_HighAmp      'High Amplitude Flag
+Alias diag_bits(3) = Flag_Tracking     'Tracking Flag
+Alias diag_bits(4) = Flag_HighDeltaC   'High Delta Speed of Sound Flag
+Alias diag_bits(5) = Flag_Acq          'Acquiring Flag
+Alias diag_bits(6) = Flag_LowVolt      'Low Supply Voltage Flag
+Alias diag_bits(7) = Flag_MemErr       'Memory Error Flag
+Alias diag_bits(8) = Flag_ADCSkip      'ADC Clock Error Flag
+Alias diag_bits(9) = Flag_TrigErr      'Trigger Error Flag
+'Wind directions and speed.
+Public wind_out(12)
+'Alias wind_out(1) = wind_spd - in compass coord system, same as CSAT3B
+'Alias wind_out(2) = result_wind_speed - in compass coord system, same as CSAT3B
+Alias wind_out(3)  = dirCSAT
+'Alias wind_out(4) = standard_wind_dir - in compass coord system, same as CSAT3B
+Alias wind_out(5)  = spdCSAT
+Alias wind_out(6)  = result_wind_speed
+Alias wind_out(7)  = wind_dir_csat
+Alias wind_out(8)  = standard_wind_dir
+'Variables for 81000
+Alias wind_out(9)  = wind_speed_81000
+Alias wind_out(10) = res_ws_81000
+Alias wind_out(11) = wind_dir_81000
+Alias wind_out(12) = std_winddir_81000
+Units dirCSAT      = degrees
+Units spdCSAT            = m/s
+Units result_wind_speed  = m/s
+Units wind_dir_csat      = degrees
+Units standard_wind_dir  = degrees
+Units wind_speed_81000 = m/s
+Units res_ws_81000 = m/s
+Units wind_dir_81000 = degress
+Units std_winddir_81000 = degrees
+'Working variables.
+Dim wind_east                      'East wind in compass coordinate system
+Dim wind_north                     'North wind in compass coordinate system
+Dim diag_integer As Long
+Dim disable_stats(2) As Boolean    'Intermediate processing disable flags

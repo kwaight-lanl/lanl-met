@@ -1,0 +1,11 @@
+  '----- Below Data Output from the CSAT3B Sensor -----
+  Maximum (1,Ts,IEEE4,False,True)
+  FieldNames("Ts_Max,TS_Tmax")
+  Minimum (1,Ts,IEEE4,False,True)
+  FieldNames("Ts_Min,Ts_TMin")
+  Average (1,Ts,IEEE4,disable_stats(1))
+  FieldNames("Ts_Avg")
+  StdDev  (1,Ts,IEEE4,disable_stats(1))
+  FieldNames("Ts_StdDev")
+  Maximum (1,WSpd81000,IEEE4,False,True)
+  '----- Above Data Output from the CSAT3B Sensor -----

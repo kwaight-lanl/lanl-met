@@ -1,0 +1,4 @@
+'  All Weather Rain Gauge wired to a pulse channel
+'    Ground:  Cable Shield Clear?
+'    P1:  Signal+ Red
+'     G:  Signal- Black

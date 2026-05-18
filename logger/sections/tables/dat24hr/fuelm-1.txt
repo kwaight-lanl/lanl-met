@@ -1,0 +1,3 @@
+  Average (1,FuelM1Hr_prct,FP2,False)
+  Minimum (1,FuelM1Hr_prct,FP2,False,False)
+  Maximum (1,FuelM1Hr_prct,FP2,False,False)

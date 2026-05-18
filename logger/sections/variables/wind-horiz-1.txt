@@ -1,0 +1,21 @@
+' RM Young 05305-AQ Horizontal Wind Speed & Direction Sensor (1)
+Public avgspd1_ms, HWDir1_deg
+Public mxgst1, dirgst1,HW1Max24HrTime(9)
+Public avgspd1_1min, HWDir1_1min, HWTime1_1min(9)
+Public mx1gst, dir1gst, HWTime1_max1min(9)
+Public MaxGustToday
+Public hhgst1
+Public mmgst1
+Public hh1gst
+Public mm1gst
+Units avgspd1_ms=meters/second
+Units mxgst1=meters/second
+Units mx1gst=meters/second
+Units dirgst1=degrees
+Units dir1gst=degrees
+Units HWDir1_deg=degrees
+Units MaxGustToday = meters/second
+Units hhgst1 = hours
+Units mmgst1 = minutes
+Units hh1gst = hours
+Units mm1gst = minutes

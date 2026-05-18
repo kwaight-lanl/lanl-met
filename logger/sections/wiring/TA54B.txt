@@ -1,0 +1,62 @@
+' RMYoung 05305-AQ Wind Speed & Direction Sensor (1)
+'    1H:  HWDir Signal Yellow
+'    Ground:  WSpd reference Green
+'    Ground:  Cable Shield White
+'    Ground:  WDir reference Black
+'    VX1:  HWDir Excite Blue
+'    P1:  HWspd Signal Red
+'
+'  RMYoung 27106T Wind Speed Sensor (1)
+'    3H:  VWspd Signal Red
+'    Ground:  WSpd reference Black
+'    Ground:  Cable Shield Clear?
+'
+'  RM Young 43347 Air Temp Sensor L-1
+'    4H: Air Temp Signal High White
+'    4L: Air Temp Signal Low Green
+'    IX1: Switched Current Excitation Red
+'    IXR: Excitation Return Black
+'    AG: Shield Clear
+'    P2: Tachometer White
+'    G:  Ground for fan Tach Red
+'    G: Shield Black
+'
+'  RM Young 43347 Air Temp Sensor L-2
+'    5H: Air Temp Signal High White
+'    5L: Air Temp Signal Low Green
+'    IX2: Switched Current Excitation Red
+'    IXR: Excitation Return Black
+'    AG: Shield Clear
+'    P3: Tachometer White
+'    G:  Ground for fan Tach Red
+'    G: Shield Black
+'
+'  CSI Leaf Wetness Sensor
+'    2H: Sensor Out  Orange or Red
+'    VX3: Sensor Excitation Brown or White
+'    AG: Analog Ground Clear
+'
+' CSAT3B
+'  CSAT3B Sonic Anemometer
+'    SDM INPUT (CSAT3B SDM address = 3)
+'    SDM-C1   CSAT3B SDM Data (green)
+'    SDM-C2   CSAT3B SDM Clock (white)
+'    SDM-C3   CSAT3B SDM Enable (brown)
+'    G    CSAT3B SDM reference (black)
+'    G    CSAT3B SDM shield (clear)
+'    POWER IN
+'    12V  datalogger (red)
+'    G  datalogger (black)
+'    EXTERNAL POWER SUPPLY
+'    POS  CSAT3B power (red)
+'      datalogger (red)
+'    NEG  CSAT3B power reference (black)
+'
+' RM Young 81000 (wired for Voltage Signal Output)
+'  12V-2:      Power to Sensor (Red)
+'  G:          Sensor Power Ground (White & Black)
+'  6H: (SE11)  V1 Wind Speed  (Green)
+'  6L: (SE12)  V2 Wind Direction (Blue)
+'  7H: (SE13)  V3 Elevation (Yellow)
+'  7L: (SE14)  V4 Temperature (Orange)
+'  AG          VRef (Brown)

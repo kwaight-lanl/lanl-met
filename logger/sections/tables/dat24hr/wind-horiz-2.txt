@@ -1,0 +1,2 @@
+  ' RM Young 05305-AQ Horizontal Wind Speed & Direction Sensor (2)
+  Average(1,HWSpd2_ms,FP2,False)  ' Avg RMY05305 (2) Wind Speed

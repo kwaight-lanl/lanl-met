@@ -1,0 +1,14 @@
+'1000X Series Datalogger
+'#########################################################################
+'#### Program Comments ###################################################
+'#########################################################################
+' Date: January XX, 2024
+' New Program: NCOM_V1.CR1X
+' Old Program: NCOM_V1.CR3
+' Comments: This is a revision to existing CR3000 code for compatibility with CR 1000X datalogger
+' Conversion by: Alexandra Saari
+'^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+'*Install Note: Setup & test communication and sensor measurements in
+' lab/office prior to field deployment!
+'^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+'******************************************************************

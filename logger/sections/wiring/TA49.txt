@@ -1,0 +1,81 @@
+'  RMYoung 05305-AQ Wind Speed & Direction Sensor (1)
+'    1H:  HWDir Signal Yellow
+'    Ground:  WSpd reference Green
+'    Ground:  Cable Shield White
+'    Ground:  WDir reference Black
+'    VX1:  HWDir Excite Blue
+'    P1:  HWspd Signal Red
+'
+'  RMYoung 05305-AQ Wind Speed & Direction Sensor (2)
+'    1L:  HWDir Signal Yellow
+'    Ground:  WSpd reference Green
+'    Ground:  Cable Shield White
+'    Ground:  WDir reference Black
+'    VX1:  HWDir Excite Blue
+'    P2:  HWspd Signal Red
+'
+'  RMYoung 05305-AQ Wind Speed & Direction Sensor (3)
+'    2H:  HWDir Signal Yellow
+'    Ground:  WSpd reference Green
+'    Ground:  Cable Shield White
+'    Ground:  WDir reference Black
+'    VX1:  HWDir Excite Blue
+'    P3:  HWspd Signal Red
+'
+'  RMYoung 27106T Wind Speed Sensor (1)
+'    3H:  VWspd Signal Red
+'    Ground:  WSpd reference Black
+'    Ground:  Cable Shield Clear?
+'
+'  RMYoung 27106T Wind Speed Sensor (2)
+'    3L:  VWspd Signal Red
+'    Ground:  WSpd reference Black
+'    Ground:  Cable Shield Clear?
+'
+'  RMYoung 27106T Wind Speed Sensor (3)
+'    4H:  VWspd Signal Red
+'    Ground:  WSpd reference Black
+'    Ground:  Cable Shield Clear?
+'
+'  MetOne 060A2 Air Temp Sensor(1)
+'    5H:  Air Temp Signal White
+'    Ground:  Air Temp reference Black
+'    Ground:  Cable shield
+'    VX2:  Excite *Wire a 23.1Kohm resistor between VX2 & 5H
+'
+'  MetOne 060A2 Air Temp Sensor (2)
+'    5L:  Air Temp Signal White
+'    Ground:  Air Temp reference Black
+'    Ground:  Cable shield
+'    VX2:  Excite *Wire a 23.1Kohm resistor between VX2 & 5L
+'
+'  MetOne 060A2 Air Temp Sensor (3)
+'    6H:  Air Temp Signal White
+'    Ground:  Air Temp reference Black
+'    Ground:  Cable shield
+'    VX2:  Excite *Wire a 23.1Kohm resistor between VX2 & 6H
+'
+'  MetOne 060A2 Air Temp Sensor (4)
+'    6L:  Air Temp Signal White
+'    Ground:  Air Temp reference Black
+'    Ground:  Cable shield
+'    VX2:  Excite *Wire a 23.1Kohm resistor between VX2 & 6L
+'
+'  Rotronics MP101A Air Temp & RH Sensor (constant power)
+'    7L:  Air Temperature Siganl Red(Brown)
+'    8H:  RH Signal White
+'    Ground:  Signal Ground Yellow
+'    Ground:  Power Ground Green
+'    Ground:  Cable Shield Clear?
+'    12V:  Power Blue
+'
+' Eppley PSP1 Precision Spectral Pyranometer (1)
+'    9H:  Signal+ Green
+'    9L:  Signal- Blue
+' *Note: Jumper wire 9L -to- ground
+'    Ground:  Cable shield Clear?
+'
+'  All Weather Rain Gauge wired to a control port
+'    Ground:  Cable Shield Clear?
+'    P4:  Signal+ Red
+'     G:  Signal- Black

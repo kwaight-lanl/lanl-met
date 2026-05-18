@@ -1,0 +1,3 @@
+' Return angles as degrees rather than radians, in ATN2 for example.
+AngleDegrees
+

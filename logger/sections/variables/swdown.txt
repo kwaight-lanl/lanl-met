@@ -1,0 +1,5 @@
+Const PSP1Cal=11.10  ' Enter PSP1Cal = Eppley Sensitivity Cal Constant in microVolt/WM^2
+Public EppPSP1_measure, EppPSP1_Wm2, EppPSP1_MJm2
+Units EppPSP1_measure=uV
+Units EppPSP1_Wm2=W/m^2
+Units EppPSP1_MJm2=MJ/m^2

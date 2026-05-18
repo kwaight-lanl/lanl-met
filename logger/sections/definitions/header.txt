@@ -1,0 +1,4 @@
+' --------------------
+' Definitions.
+' --------------------
+' Data logger channel assignments, etc.

@@ -1,0 +1,12 @@
+    'All Weather Rain Gauge wired to a control port, measurement 'Rain_inch'
+    'PulseCount(Rain_inch,1,4,2,0,0.01,0)
+	'Alexandra - PulseCount ( Dest, Reps, PChan, PConfig, POption, Mult, Offset )
+	PulseCount(Rain_inch,1,P1,1,0,0.01,0)	'changed by Alexandra, original Pconfig for "control ports only", suggested use of pull up on pulse channels. From CRBasic help manual:
+	'PConfig options:
+	'Code 	Description
+	'0 	Disabled
+	'1 	Switch Closure with pull up
+	'2 	Switch Closure with pull down (Control ports only)
+	'3 	High frequency with pull up
+	'4 	High frequency with pull down (Control ports only)
+	'5 	Low Level AC (Pulse channels only)

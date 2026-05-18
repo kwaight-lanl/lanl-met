@@ -1,0 +1,5 @@
+Public BattV, PTemp_C
+Public PVVolts
+Units BattV=Volts
+Units PTemp_C=Deg C
+Units PVVolts=V

@@ -1,0 +1,7 @@
+' RM Young 41382 Air Temp and RH
+Public temp0
+Public rh0
+Public dewp0
+Units temp0=Deg C
+Units rh0=%
+Units dewp0=Deg C

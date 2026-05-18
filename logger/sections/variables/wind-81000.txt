@@ -1,0 +1,11 @@
+' RM Young Model 81000 Ultrasonic 3D Anemometer.
+Public spd81000
+Public dir81000
+Public TempC81000
+Public w81000
+Public u81000 'Changed setting to get u-v-w instead of 3D speed-azimuth-elevation.
+Public v81000
+Public TempK81000
+Units spd81000 = m/s
+Units dir81000 = degrees
+Units w81000 = m/s

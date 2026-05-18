@@ -1,0 +1,10 @@
+    If Dat15min.EppPSP1_AVGWm2 < 6 Then 'Night should be considered <6 W/m2 from shortwave down measurement
+      Sun = False
+    Else
+      Sun = True
+    EndIf
+
+    VoltDiff(EppPSP1_measure,1,mV20,9,True,0,_60Hz,1000,0)
+    EppPSP1_Wm2=EppPSP1_measure/PSP1Cal  'ans in W/m2
+    EppPSP1_MJm2=(EppPSP1_Wm2/1000000)*PScan  'ans in MJ/m2
+

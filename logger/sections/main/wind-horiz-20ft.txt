@@ -1,0 +1,11 @@
+    PulseCount(WSpd20ft,1,2,1,1,0.1024,0)
+    BrHalf(WDir20ft,1,mV1000,1,1,1,1000,False,20000,_60Hz,355,0)
+    If WDir20ft>=360 OR WDir20ft<0 Then WDir20ft=0
+
+    ' Determine the HWSpeed, Direction & Time of Max Gust 4-levels
+    ' for a 24Hr period
+    If WSpd20ft > WSpd20ft_max24Hr Then
+      WSpd20ft_max24Hr = WSpd20ft
+      Wdir20ft_max24Hr = WDir20ft
+      RealTime (WSpd20ft_max24HrTime())
+    EndIf

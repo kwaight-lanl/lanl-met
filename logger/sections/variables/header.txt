@@ -1,0 +1,4 @@
+' --------------------
+' Declare Variables.
+' --------------------
+Const PScan=3  'enter program execution interval in seconds

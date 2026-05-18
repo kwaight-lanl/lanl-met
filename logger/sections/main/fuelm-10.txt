@@ -1,0 +1,11 @@
+    ' CS505 Fuel Moisture Sensor (constant power) measurements
+    PortSet(5,1) ' Power on the fuel moisture sensor
+    PeriodAvg(FuelM10Hr_uS,1,mV1000,25,0,0,100,10,1,0)
+    PortSet(5,0)
+    If FuelM10Hr_uS <= 17.7 Then
+      FuelM10Hr_prct=7.6298*FuelM10Hr_uS-130.0904
+    Else
+      FuelM10Hr_prct=0.0406*FuelM10Hr_uS^2+3.7685*FuelM10Hr_uS-73.7974
+    EndIf
+    ' CS205 Fuel Temperature Sensor measurement
+    Therm107 (FuelTempC,1,26,Vx1,0,_60Hz,1,0)

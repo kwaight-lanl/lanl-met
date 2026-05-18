@@ -1,0 +1,6 @@
+' RM Young 05305-AQ Horizontal Wind Speed & Direction Sensor (2)
+Public HWSpd2_ms
+Public HWDir2_deg
+Units HWSpd2_ms=meters/second
+Units HWDir2_deg=degrees
+Public HWSpd2Max24Hr, HWDir2Max24Hr,HW2Max24HrTime(9)

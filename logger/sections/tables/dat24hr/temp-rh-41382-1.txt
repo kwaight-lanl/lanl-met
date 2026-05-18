@@ -1,0 +1,7 @@
+  ' RM Young 41382 Air Temp and RH
+  Average(1,temp1,FP2,False)  
+  Fieldnames("avgtemp1")
+  Average (1,rh1,FP2,False)
+  Fieldnames("avgrh1")
+  Average(1,dewp1,FP2,False)  
+  Fieldnames("avgdewp1")

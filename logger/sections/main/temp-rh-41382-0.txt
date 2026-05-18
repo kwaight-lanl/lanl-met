@@ -1,0 +1,6 @@
+    ' RM Young 41382 Air Temp and RH
+    VoltSe (temp0,1,mV1000,se_temp_41382_lev0,1,0,250,.1,-50)
+    VoltSe (rh0,1,mV1000,se_rh_41382_lev0,1,0,250,.1,0)
+    DewPoint(dewp0,temp0,rh0)
+    If dewp0>temp0 OR dewp0=NAN Then dewp0=temp0
+

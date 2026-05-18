@@ -1,0 +1,2 @@
+  Average (1,rh0,FP2,False)
+  Fieldnames("avgrh0")

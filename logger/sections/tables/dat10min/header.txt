@@ -1,0 +1,2 @@
+DataTable(Dat10min,True,-1)
+  DataInterval(0,10,Min,10)

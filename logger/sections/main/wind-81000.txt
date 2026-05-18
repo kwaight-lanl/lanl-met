@@ -1,0 +1,22 @@
+    ' RM Young Model 81000 Ultrasonic 3D Anemometer.
+    'Changed instrument settings so that voltage output format=1 (u-v-w) instead of 2 (3D speed-azimuth-elevation).
+    VoltSe (u81000,1,mV5000,se_wind_81000_u,1,0,_60Hz,0.02,-50)
+    VoltSe (v81000,1,mV5000,se_wind_81000_v,1,0,_60Hz,0.02,-50)
+    VoltSe (w81000,1,mV5000,se_wind_81000_w,1,0,_60Hz,0.02,-50)
+    VoltSe (TempK81000,1,mV5000,se_wind_81000_t,1,0,_60Hz,0.02,220) 'Temp relationship is different than u-v-w
+    TempC81000 = TempK81000 - 273.15
+
+    'Calculate horizontal wind speed from u and v.
+    spd81000 = SQR(u81000*u81000 + v81000*v81000)
+
+    'Calculate wind direction from u and v.
+    If u81000 = 0.0 and v81000 = 0.0 then
+        dir81000 = 0.0
+    ElseIf u81000 = 0.0 and v81000 > 0.0 then
+        dir81000 = 180.0
+    ElseIf u81000 = 0.0 and v81000 < 0.0 then
+        dir81000 = 0.0
+    Else
+        dir81000 = ATN2(u81000, v81000)      ' Produces degrees because of AngleDegrees statement.
+        dir81000 = (dir81000 + 360) MOD 360 ' ATN2 produces -180 to +180 deg.
+    EndIf

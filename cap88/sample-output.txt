@@ -1,0 +1,169 @@
+
+Reading LANL file: TA6_15.csv
+WARNING: Cannot calculate sigma-E and stability class with a zero wind speed at 2017-01-11 09:45:00 , will be ignored.
+WARNING: Cannot calculate sigma-E and stability class with a zero wind speed at 2017-01-11 10:00:00 , will be ignored.
+WARNING: Cannot calculate sigma-E and stability class with a zero wind speed at 2017-01-11 10:15:00 , will be ignored.
+WARNING: Cannot calculate sigma-E and stability class with a zero wind speed at 2017-01-11 10:30:00 , will be ignored.
+WARNING: Cannot calculate sigma-E and stability class with a zero wind speed at 2017-01-11 10:45:00 , will be ignored.
+WARNING: Cannot calculate sigma-E and stability class with a zero wind speed at 2017-01-11 11:00:00 , will be ignored.
+WARNING: Cannot calculate sigma-E and stability class with a zero wind speed at 2017-01-11 11:15:00 , will be ignored.
+WARNING: Cannot calculate sigma-E and stability class with a zero wind speed at 2017-01-11 11:30:00 , will be ignored.
+WARNING: Cannot calculate sigma-E and stability class with a zero wind speed at 2017-01-11 11:45:00 , will be ignored.
+WARNING: Cannot calculate sigma-E and stability class with a zero wind speed at 2017-01-11 12:00:00 , will be ignored.
+WARNING: Cannot calculate sigma-E and stability class with a zero wind speed at 2017-01-11 12:15:00 , will be ignored.
+WARNING: Cannot calculate sigma-E and stability class with a zero wind speed at 2017-01-11 12:30:00 , will be ignored.
+WARNING: Cannot calculate sigma-E and stability class with a zero wind speed at 2017-01-11 12:45:00 , will be ignored.
+WARNING: Cannot calculate sigma-E and stability class with a zero wind speed at 2017-01-11 13:00:00 , will be ignored.
+WARNING: Cannot calculate sigma-E and stability class with a zero wind speed at 2017-02-14 23:45:00 , will be ignored.
+WARNING: Cannot calculate sigma-E and stability class with a zero wind speed at 2017-02-15 00:00:00 , will be ignored.
+WARNING: Cannot calculate sigma-E and stability class with a zero wind speed at 2017-05-19 09:30:00 , will be ignored.
+WARNING: Cannot calculate sigma-E and stability class with a zero wind speed at 2017-08-12 01:30:00 , will be ignored.
+WARNING: Cannot calculate sigma-E and stability class with a zero wind speed at 2018-01-19 05:00:00 , will be ignored.
+WARNING: Cannot calculate sigma-E and stability class with a zero wind speed at 2018-07-11 23:30:00 , will be ignored.
+WARNING: Cannot calculate sigma-E and stability class with a zero wind speed at 2018-10-26 06:00:00 , will be ignored.
+WARNING: Cannot calculate sigma-E and stability class with a zero wind speed at 2019-01-27 08:45:00 , will be ignored.
+WARNING: Cannot calculate sigma-E and stability class with a zero wind speed at 2019-05-11 01:45:00 , will be ignored.
+WARNING: Cannot calculate sigma-E and stability class with a zero wind speed at 2019-05-11 02:00:00 , will be ignored.
+
+Build list of all possible 15 min times:
+
+Calculate how much data is present for each year:
+    2015  99.9% of 15 min data is good
+    2016  89.7% of 15 min data is good
+    2017  98.9% of 15 min data is good
+    2018  97.3% of 15 min data is good
+    2019  98.9% of 15 min data is good
+
+ 146705 total times found.
+146705 times with good data.
+24  times ignored because of bad data.
+
+Calculate frequencies for each combination of wind direction/stability class/wind speed:
+Total sum of all frequencies after rounding to 5 digits: 1.00001
+
+Simple depiction of frequencies:
+   (single digits are % of total, . is < 1%, + is >= 10%)
+
+Stability Class: A
+     ------
+N   |..    |
+NNE |..    |
+NE  |..    |
+ENE |..    |
+E   |..    |
+ESE |..    |
+SE  |..    |
+SSE |..    |
+S   |..    |
+SSW |..    |
+SW  |..    |
+WSW |..    |
+W   |..    |
+WNW |..    |
+NW  |..    |
+NNW |..    |
+     ------
+
+Stability Class: B
+     ------
+N   |...   |
+NNE |...   |
+NE  |...   |
+ENE |...   |
+E   |..    |
+ESE |..    |
+SE  |..    |
+SSE |...   |
+S   |..    |
+SSW |...   |
+SW  |...   |
+WSW |...   |
+W   |...   |
+WNW |...   |
+NW  |...   |
+NNW |...   |
+     ------
+
+Stability Class: C
+     ------
+N   |...   |
+NNE |....  |
+NE  |...   |
+ENE |...   |
+E   |.1.   |
+ESE |.1.   |
+SE  |.1.   |
+SSE |.1.   |
+S   |.1..  |
+SSW |....  |
+SW  |....  |
+WSW |....  |
+W   |....  |
+WNW |....  |
+NW  |....  |
+NNW |....  |
+     ------
+
+Stability Class: D
+     ------
+N   |.1....|
+NNE |.11...|
+NE  |.1... |
+ENE |.1..  |
+E   |.1..  |
+ESE |.1..  |
+SE  |.1... |
+SSE |.21.. |
+S   |1231. |
+SSW |.231. |
+SW  |.121..|
+WSW |.111..|
+W   |.121..|
+WNW |.121..|
+NW  |.111..|
+NNW |.1....|
+     ------
+
+Stability Class: E
+     ------
+N   |.1.   |
+NNE |...   |
+NE  |...   |
+ENE |...   |
+E   |...   |
+ESE |...   |
+SE  |...   |
+SSE |...   |
+S   |.1.   |
+SSW |.2.   |
+SW  |.21   |
+WSW |.11   |
+W   |.1.   |
+WNW |.11   |
+NW  |.1.   |
+NNW |.1.   |
+     ------
+
+Stability Class: F
+     ------
+N   |11    |
+NNE |..    |
+NE  |..    |
+ENE |..    |
+E   |..    |
+ESE |..    |
+SE  |..    |
+SSE |..    |
+S   |..    |
+SSW |..    |
+SW  |11    |
+WSW |12    |
+W   |12    |
+WNW |12    |
+NW  |12    |
+NNW |11    |
+     ------
+
+Writing to STAR file: star.dat
+
+ /home/maq/bin/tower2star.py completed.

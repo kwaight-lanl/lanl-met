@@ -1,0 +1,13 @@
+        'SDMS40 Laser Snow Sensor
+	'Automatically calibrate the SDMS40 (SDI-12) Multipoint Scanning Snowfall Sensor to
+	'determine installation angle and height if 'SDMS40_Cal_Now' is changed to 'True'
+	If SDMS40_Cal_Now
+	    SDI12Recorder(SDMS40_Cal_Ret,1,"0","XA!",1,0)
+	    Delay(1,10,Sec)
+	    SDMS40_Cal_Now=False
+	EndIf
+	'SDMS40 (SDI-12) Multipoint Scanning Snowfall Sensor measurement 'Snow_Depth_Avg'
+	If TimeIntoInterval(0,15,Min) Then
+            SDI12Recorder(SnowDepth_in_Avg,sdi_snow,"0","M!",0.0393701,0)
+	EndIf
+

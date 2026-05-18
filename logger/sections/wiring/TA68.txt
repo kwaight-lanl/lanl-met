@@ -1,0 +1,45 @@
+' Photovoltaic Panel Voltage (Direct Wire)
+' 2H  Black Wire
+' 2L:  White Wire
+' G:  Cable Shield-Not Connected
+
+' 43502 RMYoung Aspiration Shield & Fan Motor
+'  12V-2:      Power to fan motor (Red)
+'  G:          Power Ground/Return (Black)
+'  P3:         Fan Tachometer RPM(Yellow)
+'
+'
+' 43502 RMYoung Aspiration Shield & Fan Motor
+'  12V-2:      Power to fan motor (Red)
+'  G:          Power Ground/Return (Black)
+'  P4:         Fan Tachometer RPM(Yellow)
+
+' RM Young 41382 #1 Air Temp & RH Sensor 0-1 V Output
+' 4H: Air Temp Signal Red
+' 4L: RH Signal Green
+' AG: Signal Reference Brown
+' +PWR: Power White
+' PWR REF: Power Ground Black
+' G: Shield Black
+
+' RM Young 41382 #2 Air Temp & RH Sensor 0-1 V Output
+' 5H: Air Temp Signal Red
+' 5L: RH Signal Green
+' AG: Signal Reference Brown
+' +PWR: Power White
+' PWR REF: Power Ground Black
+' G: Shield Black
+
+' RM Young 27106T Wind Speed Sensor (1)
+' 3H:  VWspd Signal Red
+' Ground:  WSpd reference Black
+' Ground:  Cable Shield Clear?
+
+' RM Young 81000 (wired for Voltage Signal Output)
+' 12V-2:  Power to Sensor (Red)
+' G:  Sensor Power Ground (White & Black)
+' 6H: (SE11) V1 Wind Speed (Green)
+' 6L: (SE12) V2 Wind Direction (Blue)
+' 7H: (SE13) V3 Elevation (Yellow)
+' 7L: (SE14) V4 Temperature (Orange)
+' AG VRef (Brown)

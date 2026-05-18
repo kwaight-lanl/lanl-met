@@ -1,0 +1,5 @@
+  ' RM Young 27106T Vertical Wind Speed Sensor (1)
+  StdDev(1,w1,FP2,False)  'StdDev RMY27106T (1) Wind Speed
+  FieldNames("sdw1")
+  Average(1,w1,FP2,False)  'Avg RMY27106T (1) Wind Speed
+  FieldNames("w1")

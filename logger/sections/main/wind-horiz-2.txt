@@ -1,0 +1,13 @@
+    ' RM Young 05305-AQ Wind Speed & Direction Sensor (2)
+    '  Wind Speed & Direction Sensor measurements 'HWSpd2_ms' and 'HWDir2_deg'
+    PulseCount(HWSpd2_ms,1,2,1,1,0.1024,0)
+    BrHalf(HWDir2_deg,1,mV1000,2,1,1,1000,False,20000,_60Hz,355,0)
+    If HWDir2_deg>=360 OR HWDir2_deg<0 Then HWDir2_deg=0
+
+    ' Determine the HWSpeed, Direction & Time of Max Gust 4-levels
+    ' for a 24Hr period
+    If HWSpd2_ms > HWSpd2Max24Hr Then
+      HWSpd2Max24Hr = HWSpd2_ms
+      HWDir2Max24Hr = HWDir2_deg
+      RealTime (HW2Max24HrTime())
+    EndIf

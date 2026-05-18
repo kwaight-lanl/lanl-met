@@ -1,0 +1,2 @@
+    CallTable Dat15min
+    CallTable Dat24Hr
