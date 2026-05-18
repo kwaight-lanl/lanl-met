@@ -312,8 +312,11 @@ vars = ['avgspd1', 'mxgst1',
         'lwedn', 'lweup', 
         'nete']
 # Spreadsheet column names of the variables.
-columnDateTime1 = 'Date/Time' # Data request from yellow Weather Machine.
-columnDateTime2 = 'dts'       # Data request from current Weather Machine.
+#ktw columnDateTime1 = 'Date/Time' # Data request from yellow Weather Machine.
+#ktw columnDateTime2 = 'dts'       # Data request from current Weather Machine.
+columnDateTime1 = 'datetime'  # From current Weather Machine Data Request.
+columnDateTime2 = 'DateTime'  # From WMDC Download (with the order reversed).
+columnDateTime3 = 'Date/Time' # From a Data Dump.
 column = {}
 column['avgspd1'] = 'avgspd1'
 column['mxgst1'] = 'mxgst1'

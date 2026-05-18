@@ -88,13 +88,12 @@ WIND_SPEED_MAX = 200.0  # Maximum wind speed that will be allowed. Any higher or
 RELATIVE_HUMIDITY_MAX = 100.0  # Maximum relative humidity allowed (%).
 SURFACE_PRESSURE_MIN = 700.0  # Minimum surface pressure allowed (mb).
 SURFACE_PRESSURE_MAX = 900.0  # Maximum surface pressure allowed (mb).
-SHORTWAVE_DOWN_MAX = 40.0  # Maximum downward shortwave allowed (MJ/m2).
-SHORTWAVE_UP_MAX = 25.0  # Maximum upward shortwave allowed (MJ/m2).
-LONGWAVE_DOWN_MAX = 40.0  # Maximum downward longwave allowed (MJ/m2).
-LONGWAVE_UP_MAX = 50.0  # Maximum upward longwave allowed (MJ/m2).
-NET_RADIATION_MAX = 30.0  # Maximum net radiation allowed (MJ/m2).
-NET_RADIATION_MIN = -10.0  # Minimum net radiation allowed (MJ/m2).
-# Other.
+SHORTWAVE_DOWN_MAX = 1400.0  # Maximum downward shortwave allowed (W/m2).
+SHORTWAVE_UP_MAX = 1000.0  # Maximum upward shortwave allowed (W/m2).
+LONGWAVE_DOWN_MAX = 1000.0  # Maximum downward longwave allowed (W/m2).
+LONGWAVE_UP_MAX = 1000.0  # Maximum upward longwave allowed (W/m2).
+NET_RADIATION_MAX = 1000.0  # Maximum net radiation allowed (W/m2).
+NET_RADIATION_MIN = -1000.0  # Minimum net radiation allowed (W/m2).
 
 # ----------------------------------------------------------------
 # Parse arguments.
@@ -123,18 +122,19 @@ else:
 # ---------------------------------------
 # Variables to process.
 vars = ['windSpeed1', 'vertVelocity1',
-        'temp1', 'pres', 'RH1', 'Td1',
+        'temp0', 'pres', 'RH1', 'Td1',
         'precip', 'snowDepth', 
         'swDown', 'swUp',
         'lwDown', 'lwUp', 
         'netRad',
         'windChill']
 # Spreadsheet column names of the variables.
-columnDateTime = 'Date/Time'
+columnDateTime = 'datetime'
+#columnDateTime = 'Date/Time'
 column = {}
 column['windSpeed1'] = 'spd1'
 column['vertVelocity1'] = 'w1'
-column['temp1'] = 'temp1'
+column['temp0'] = 'temp0'
 column['pres'] = 'press'
 column['RH1'] = 'rh'
 column['Td1'] = 'dewp'
@@ -149,7 +149,7 @@ column['netRad'] = 'netrad'
 unitsInput = {}
 unitsInput['windSpeed1'] = 'm/s'
 unitsInput['vertVelocity1'] = 'm/s'
-unitsInput['temp1'] = 'C'
+unitsInput['temp0'] = 'C'
 unitsInput['pres'] = 'mb'
 unitsInput['RH1'] = '%'
 unitsInput['Td1'] = 'C'
@@ -165,7 +165,7 @@ unitsInput['windChill'] = 'C'
 unitsOptional = {}
 unitsOptional['windSpeed1'] = 'mph'
 unitsOptional['vertVelocity1'] = 'cm/s'
-unitsOptional['temp1'] = 'F'
+unitsOptional['temp0'] = 'F'
 unitsOptional['pres'] = 'mb'
 unitsOptional['RH1'] = '%'
 unitsOptional['Td1'] = 'F'
@@ -222,6 +222,7 @@ dtList = []
 yyyymmdds = []
 nBad = 0
 nDiag = 0
+windChillMin = 0.0 #ktw
 with open(metFile, 'r') as infile:
     towerData = csv.DictReader(infile)
     next(towerData)
@@ -232,7 +233,7 @@ with open(metFile, 'r') as infile:
              'year' in row.keys()) and 
             row[column['windSpeed1']] and
             row[column['vertVelocity1']] and
-            row[column['temp1']] and
+            row[column['temp0']] and
             row[column['pres']] and
             row[column['RH1']] and
             row[column['Td1']] and
@@ -254,8 +255,8 @@ with open(metFile, 'r') as infile:
         if columnDateTime in row.keys():
             # Get the date from Date/Time column (yellow network).
             try:
-                # Try the default Weather Machine formatted date.
-                dt = datetime.strptime(row[columnDateTime], "%Y-%m-%d %H:%M:%S")
+                # Try the Weather Machine data request formatted date.
+                dt = datetime.strptime(row[columnDateTime], "%Y-%m-%d %H:%M")
             except:
                 # Try a datalogger formatted date.
                 try:
@@ -302,21 +303,25 @@ with open(metFile, 'r') as infile:
         else:
             vertVelocity1 = None
         # Temperature at level 1 in C.
-        if '*' not in row[column['temp1']]:
-            temp1 = float(row[column['temp1']])  
-            varAll['temp1'].append(temp1)
-            varMonth['temp1'][mm].append(temp1)
-            varYear['temp1'][yyyy] = varYear['temp1'].get(yyyy, [])
-            varYear['temp1'][yyyy].append(temp1)
+        if '*' not in row[column['temp0']]:
+            temp0 = float(row[column['temp0']])  
+            varAll['temp0'].append(temp0)
+            varMonth['temp0'][mm].append(temp0)
+            varYear['temp0'][yyyy] = varYear['temp0'].get(yyyy, [])
+            varYear['temp0'][yyyy].append(temp0)
         else:
-            temp1 = None
+            temp0 = None
         # Calculate wind chill temperature in C.
-        if (temp1 is not None and
+        if (temp0 is not None and
             windSpeed1 is not None):
-            temp1F = TC2F(temp1)
+            temp0F = TC2F(temp0)
             windSpeed1Mph = wspdMs2Mph(windSpeed1)
-            windChillF = calcWindChill(temp1F, windSpeed1Mph)
+            windChillF = calcWindChill(temp0F, windSpeed1Mph)
             windChill = TF2C(windChillF)
+            #ktw: Find time of lowest wind chill.
+            if windChill < windChillMin:
+                #ktw print('dt, t0, windSpeed1, wind chill min:', dt, temp0, windSpeed1, windChill)
+                windChillMin = windChill
             varAll['windChill'].append(windChill)
             varMonth['windChill'][mm].append(windChill)
             varYear['windChill'][yyyy] = varYear['windChill'].get(yyyy, [])
@@ -360,8 +365,6 @@ with open(metFile, 'r') as infile:
             varMonth['precip'][mm].append(precip)
             varYear['precip'][yyyy] = varYear['precip'].get(yyyy, [])
             varYear['precip'][yyyy].append(precip)
-            precipYear[yyyy] = precipYear.get(yyyy, [])
-            precipYear[yyyy].append(precip)
         else:
             precip = None
         # Snow depth in inches.
@@ -372,8 +375,6 @@ with open(metFile, 'r') as infile:
             varMonth['snowDepth'][mm].append(snowDepth)
             varYear['snowDepth'][yyyy] = varYear['snowDepth'].get(yyyy, [])
             varYear['snowDepth'][yyyy].append(snowDepth)
-            snowDepthYear[yyyy] = snowDepthYear.get(yyyy, [])
-            snowDepthYear[yyyy].append(snowDepth)
         else:
             snowDepth = None
         # Downward shortwave radiation (W/m2).
@@ -436,7 +437,7 @@ with open(metFile, 'r') as infile:
         # -------------------------------------------------
         if (windSpeed1 is not None or
             vertVelocity1 is not None or
-            temp1 is not None or 
+            temp0 is not None or 
             pres is not None or 
             RH1 is not None or 
             Td1 is not None or 
@@ -519,10 +520,10 @@ if verbosity >= 2:
 # -----------------------------------------
 # Calculate and print averages and medians.
 # -----------------------------------------
-print('\n================')
-print('Daily Statistics')
-print('================')
-print('\nDaily maximums, minimums, averages and medians for all times:')
+print('\n====================')
+print('15-minute Statistics')
+print('====================')
+print('\n15-minute maximums, minimums, averages and medians for all times:')
 print('      variable       maximum       minimum       average        median')
 print(' ------------- ------------- ------------- ------------- -------------')
 for var in vars:
@@ -552,20 +553,21 @@ for var in vars:
     print(' ------------- ------------- ------------- ------------- -------------')
     for month in range(1, 13):
         mm = '{:02d}'.format(month)
-        maximum = max(varMonth[var][mm])
-        minimum = min(varMonth[var][mm])
-        average = statistics.mean(varMonth[var][mm])
-        median = statistics.median(varMonth[var][mm])
-        if (unitsInput[var] != unitsOptional[var] and
-            changeUnits == True):
-            # Convert to optional units.
-            results = (maximum, minimum, average, median)
-            maximum, minimum, average, median = input2optional(
-                unitsInput[var], unitsOptional[var], 
-                *results)
-        print(' {:13d} {:13.2f} {:13.2f} {:13.2f} {:13.2f}'.format(int(mm),
-                                                                   maximum, minimum,
-                                                                   average, median))
+        if len(varMonth[var][mm]) > 0:
+            maximum = max(varMonth[var][mm])
+            minimum = min(varMonth[var][mm])
+            average = statistics.mean(varMonth[var][mm])
+            median = statistics.median(varMonth[var][mm])
+            if (unitsInput[var] != unitsOptional[var] and
+                changeUnits == True):
+                # Convert to optional units.
+                results = (maximum, minimum, average, median)
+                maximum, minimum, average, median = input2optional(
+                    unitsInput[var], unitsOptional[var], 
+                    *results)
+            print(' {:13d} {:13.2f} {:13.2f} {:13.2f} {:13.2f}'.format(int(mm),
+                                                                       maximum, minimum,
+                                                                       average, median))
 
 
 # ----------------------
@@ -610,112 +612,6 @@ for var in vars:
                                                       maximum, minimum,
                                                       average, median))
         
-# -----------------------------------------
-# Calculate yearly total degree days stats.
-# -----------------------------------------
-# Heating degree days.
-print('\nMaximums, minimums, averages and medians for yearly total heating degree days:')
-print('       maximum       minimum       average        median')
-print(' ------------- ------------- ------------- -------------')
-varYearTotals = []
-for yyyy in heatingDegreeDaysYear.keys():
-    varYearTotal = sum(heatingDegreeDaysYear[yyyy])
-    varYearTotals.append(varYearTotal)
-maximum = max(varYearTotals)
-minimum = min(varYearTotals)
-average = statistics.mean(varYearTotals)
-median = statistics.median(varYearTotals)
-if (unitsInput[var] != unitsOptional[var] and
-    changeUnits == True):
-    # Convert to optional units.
-    results = (maximum, minimum, average, median)
-    maximum, minimum, average, median = input2optional(
-        unitsInput[var], unitsOptional[var], 
-        *results)
-print(' {:13.2f} {:13.2f} {:13.2f} {:13.2f}'.format(maximum, minimum,
-                                                    average, median))
-# Cooling degree days.
-print('\nMaximums, minimums, averages and medians for yearly total cooling degree days:')
-print('       maximum       minimum       average        median')
-print(' ------------- ------------- ------------- -------------')
-varYearTotals = []
-for yyyy in coolingDegreeDaysYear.keys():
-    varYearTotal = sum(coolingDegreeDaysYear[yyyy])
-    varYearTotals.append(varYearTotal)
-maximum = max(varYearTotals)
-minimum = min(varYearTotals)
-average = statistics.mean(varYearTotals)
-median = statistics.median(varYearTotals)
-if (unitsInput[var] != unitsOptional[var] and
-    changeUnits == True):
-    # Convert to optional units.
-    results = (maximum, minimum, average, median)
-    maximum, minimum, average, median = input2optional(
-        unitsInput[var], unitsOptional[var], 
-        *results)
-print(' {:13.2f} {:13.2f} {:13.2f} {:13.2f}'.format(maximum, minimum,
-                                                    average, median))
-
-# ------------------------------------
-# Calculate yearly total precip stats.
-# ------------------------------------
-print('\nMaximums, minimums, averages and medians for yearly total precipitation:')
-print('       maximum       minimum       average        median')
-print(' ------------- ------------- ------------- -------------')
-varYearTotals = []
-for yyyy in precipYear.keys():
-    varYearTotal = sum(precipYear[yyyy])
-    varYearTotals.append(varYearTotal)
-maximum = max(varYearTotals)
-minimum = min(varYearTotals)
-average = statistics.mean(varYearTotals)
-median = statistics.median(varYearTotals)
-if (unitsInput[var] != unitsOptional[var] and
-    changeUnits == True):
-    # Convert to optional units.
-    results = (maximum, minimum, average, median)
-    maximum, minimum, average, median = input2optional(
-        unitsInput[var], unitsOptional[var], 
-        *results)
-print(' {:13.2f} {:13.2f} {:13.2f} {:13.2f}'.format(maximum, minimum,
-                                                    average, median))
-
-# -----------------------------------------------------
-# Print latest and earliest freeze dates for each year,
-#   and calculate averages.
-# -----------------------------------------------------
-print('\nLatest and earliest freezes for each year:')
-print(' yyyy  last first')
-print(' ---- ----- -----')
-yyyyCalc = datetime.strftime(datetime.utcnow(), '%Y')
-timestampLasts = []
-timestampFirsts = []
-for yyyy in firstFreeze.keys():
-    print(' {:4s} {:2s}/{:2s} {:2s}/{:2s}'.format(yyyy, 
-                                                  lastFreeze[yyyy][0:2], lastFreeze[yyyy][2:4], 
-                                                  firstFreeze[yyyy][0:2], firstFreeze[yyyy][2:4]))
-    # Average by calculating timestamps in the same arbitrary year (use current year).
-    yyyymmddLast = yyyyCalc + lastFreeze[yyyy]
-    dtLast = datetime.strptime(yyyymmddLast, '%Y%m%d')
-    timestampLast = dtLast.timestamp()
-    timestampLasts.append(timestampLast)
-    yyyymmddFirst = yyyyCalc + firstFreeze[yyyy]
-    dtFirst = datetime.strptime(yyyymmddFirst, '%Y%m%d')
-    timestampFirst = dtFirst.timestamp()
-    timestampFirsts.append(timestampFirst)
-# Calculate and print averages.
-timestampLastAvg = statistics.mean(timestampLasts)
-dtLastAvg = datetime.fromtimestamp(timestampLastAvg)
-mmddLastAvg = dtLastAvg.strftime('%m/%d')
-timestampFirstAvg = statistics.mean(timestampFirsts)
-dtFirstAvg = datetime.fromtimestamp(timestampFirstAvg)
-mmddFirstAvg = dtFirstAvg.strftime('%m/%d')
-delta = dtFirstAvg - dtLastAvg 
-growingDays = delta.days - 1
-print('\nAverage latest freeze: {:5s}'.format(mmddLastAvg))
-print('Average earliest freeze: {:5s}'.format(mmddFirstAvg))
-print('Average growing season: {:d} days'.format(growingDays))
-
 # ----
 # End.
 # ----

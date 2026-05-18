@@ -99,7 +99,7 @@ SIGMA_E_MAX = 90.0  # Maximum allowed value of sigma-E. Any higher or negative v
 Z0 = 40.  # Assumed value for LANL, earlier PV-WAVE program. 
 WIND_MEASUREMENT_HEIGHT = 10.0  # Lowest measurement height assumed to be 10 m -- use "-windheight 11.5" for most LANL towers.
 ADJUST_FREQUENCY = False  # Try to slightly adjust one frequency to make the total exactly 1.
-ROUND_FREQUENCIES = True  # Round frequencies to four digits when calculating total, because that's
+ROUND_FREQUENCIES = False  # Round frequencies to four digits when calculating total, because that's
                           #   what the STARGET program seems to do.
 
 # ----------------------------------------------------------------

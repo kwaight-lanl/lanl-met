@@ -106,7 +106,10 @@ else:
 # ---------------------------------------
 # Input and output data file information.
 # ---------------------------------------
-columnDateTime = 'Date/Time'
+columnDateTime1 = 'datetime'  # From current Weather Machine Data Request.
+columnDateTime2 = 'DateTime'  # From WMDC Download (with the order reversed).
+columnDateTime3 = 'Date/Time' # From a Data Dump.
+#ktw columnDateTime = 'Date/Time'
 columnWindSpeed1 = 'spd1'
 columnWindDir1 = 'dir1'
 columnStdDevW1 = 'sdw1'
@@ -252,20 +255,25 @@ nDiag = 0
 with open(metFile, 'r') as infile:
     towerData = csv.DictReader(infile)
     for row in towerData:
+        columnDateTime = columnDateTime1  #ktw Maybe add other datetime formats later.
         if (row[columnDateTime] and # Should be at least these fields.
             row[columnWindSpeed1] and
             row[columnStdDevW1] and
             row[columnSWDown] and
-            (re.search(r'^\d+-\d+-\d+ \d+:\d+:\d+', row[columnDateTime]) or
+            (re.search(r'^\d+-\d+-\d+ \d+:\d+', row[columnDateTime]) or
              re.search(r'^\d+/\d+/\d+ \d+:\d+', row[columnDateTime]))):
             # This should be a data line (ignore header lines).
             #print('row[0]:', row[columnDateTime]) #ktw
             try:
-                # Try the default Weather Machine formatted date.
-                dt = datetime.strptime(row[columnDateTime], "%Y-%m-%d %H:%M:%S")
+                # Try a yellow Weather Machine-formatted date.
+                ndt = datetime.strptime(row[columnDateTime], "%Y-%m-%d %H:%M:%S")
             except:
-                # Try a datalogger formatted date.
-                dt = datetime.strptime(row[columnDateTime], "%m/%d/%Y %H:%M")
+                try:
+                    # Try a datalogger-formatted date.
+                    dt = datetime.strptime(row[columnDateTime], "%m/%d/%Y %H:%M")
+                except:
+                    # Try a new Weather Machine-formatted date.
+                    dt = datetime.strptime(row[columnDateTime], "%Y-%m-%d %H:%M")
             # Save first time.
             if dtFirst is None:
                 dtFirst = dt
@@ -363,7 +371,6 @@ with open(metFile, 'r') as infile:
                 # Assign the wind direction bin.
                 # ---------------------------------------------------------
                 for bin in windDirBins.keys():
-                    #ktw print('windDir1, bin, windDirBins[bin]:', windDir1, bin, windDirBins[bin], windDirBins[bin][0])
                     if (windDir1 >= windDirBins[bin][0] and
                         windDir1 < windDirBins[bin][1]):
                         if (bin == 'N1' or
@@ -422,6 +429,7 @@ with open(metFile, 'r') as infile:
 # ----------------------------------------
 print('\nBuild list of all possible 15 min times:')
 dt15All = []
+print('dtFirst,dtLast:', dtFirst,dtLast)
 if (dtFirst is not None and
     dtLast is not None):
     dt = dtFirst

@@ -2,7 +2,7 @@
 
 """
 tower2sunshine.py
-Read a 15-min csv file for one tower site, calculate the hours of sunshine and % sunshine for each year.
+Read a 15-min csv file for one tower site, calculate the hours of sunshine and % sunshine for each year, and average peak solar hours per day.
 Method from the paper:
 Hinssen, Y.B.L. and W.H. Knap, 2007:  Comparison of pyranometric and pyrheliometric methods for the 
   determination of sunshine duration. J. Atmos. Ocean. Tech., 24, 835-846.
@@ -101,7 +101,7 @@ def calc_solar_params(verbosity, latitude, longitude, dtUtc):
         print(" Time                          : {0:2s}:{1:2s} UTC".format(hr, mn))
         print(" Date                          : {0:4s} {1:2s} {2:2s}".format(yyyy, mm, dd))
         print(" Day of year                   : {:.1f}".format(dayofyear))
-        print(" Terrain height                : {:.1f} m".format(self.elevation))
+        #ktw print(" Terrain height                : {:.1f} m".format(self.elevation))
         print(" --------------------------------------------------")
         print(" Declination                   : {:.2f} deg".format(solarDeclination))
         print(" Local std. time meridian      : {:.2f} deg".format(lstm))
@@ -111,7 +111,7 @@ def calc_solar_params(verbosity, latitude, longitude, dtUtc):
         print(" Zenith angle                  : {:.2f} deg".format(solarZenith))
         print(" Cosine zenith                 : {:.4f}".format(cosZenith))
         print(" Elevation angle               : {:.2f} deg".format(solarElevation))
-        print(" Daytime?                      : {:}".format(daytime))
+        #ktw print(" Daytime?                      : {:}".format(daytime))
 
     # Return results.
     return dayofyear, cosZenith
@@ -158,14 +158,14 @@ else:
 # Input and output data file information.
 # ---------------------------------------
 columnName = {}
-columnName['DateTime'] = 'Date/Time'
+columnName['DateTime'] = 'datetime'
 columnName['swdn'] = 'swdn'
 
 # =======
 # Banner.
 # =======
 print('\n =====================================================\n',
-      'Calculate sunshine duration\n',
+      'Calculate sunshine duration and peak solar hours\n',
       '=====================================================\n')
 print(*sys.argv)
 
@@ -181,17 +181,19 @@ dtLast = None
 dtList = []
 sunshineHours = {}
 sunshineHoursMax = {}
+swdnTot = 0.0
+nSwdn = 0
 with open(metFile, 'r') as infile:
     towerData = csv.DictReader(infile)
     for row in towerData:
         if (row[columnName['DateTime']] and
-            (re.search(r'^\d+-\d+-\d+ \d+:\d+:\d+', row[columnName['DateTime']]) or
+            (re.search(r'^\d+-\d+-\d+ \d+:\d+', row[columnName['DateTime']]) or
              re.search(r'^\d+/\d+/\d+ \d+:\d+', row[columnName['DateTime']]))):
             # This should be a data line (ignore header lines).
             #print('row[0]:', row[columnName['DateTime']]) #ktw
             try:
                 # Try the default Weather Machine formatted date.
-                dt = datetime.strptime(row[columnName['DateTime']], "%Y-%m-%d %H:%M:%S")
+                dt = datetime.strptime(row[columnName['DateTime']], "%Y-%m-%d %H:%M")
             except:
                 # Try a datalogger formatted date.
                 dt = datetime.strptime(row[columnName['DateTime']], "%m/%d/%Y %H:%M")
@@ -239,6 +241,13 @@ with open(metFile, 'r') as infile:
                     #   and maximum hours of sunshine.
                     sunshineHours[yyyy] += f * HOURS_PERIOD
                     sunshineHoursMax[yyyy] += HOURS_PERIOD
+                # Accumulate downward shortwave.
+                if swdn >= 0.0:
+                    swdnTot += swdn
+                    nSwdn += 1
+                elif swdn < 0.0:
+                    # For negative swdn, just increment the count.
+                    nSwdn += 1
             # Save the last time.
             dtLast = dt
 
@@ -260,6 +269,15 @@ totalPercent = 100.0 * (totalHours/totalHoursMax)
 totalHoursAvg = totalHours / float(nYears)
 print('----  ----  -----')
 print('      {:4.0f}  {:5.1f}%'.format(round(totalHoursAvg), totalPercent))
+
+# ---------------------------------------------------------------
+# Show the average swdn value for this period, and calculate
+#   the corresponding average peak solar hours per day.
+# ---------------------------------------------------------------
+swdnAvg = swdnTot / float(nSwdn)
+print('\nAverage downward shortwave for this period: {:5.1f}'.format(swdnAvg))
+peakSolarAvg = (swdnAvg*24.0) / 1000.0
+print('\nAverage peak solar hours per day for this period: {:3.1f}'.format(peakSolarAvg))
 
 # ----
 # End.

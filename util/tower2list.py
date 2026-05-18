@@ -308,8 +308,9 @@ else:
 # ---------------------------------------
 # Input and output data file information.
 # ---------------------------------------
-columnDateTime1 = 'Date/Time' # Data request from old yellow Weather Machine.
-columnDateTime2 = 'dts'       # Data request from current Weather Machine.
+columnDateTime1 = 'datetime'  # From current Weather Machine Data Request.
+columnDateTime2 = 'DateTime'  # From WMDC Download (with the order reversed).
+columnDateTime3 = 'Date/Time' # From a Data Dump.
 columnName = {}
 columnName['dir1'] = 'dir1'
 columnName['dir2'] = 'dir2'

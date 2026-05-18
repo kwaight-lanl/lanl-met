@@ -1,0 +1,220 @@
+ =====================================
+ Creation of a STAR file for CAP88
+ =====================================
+
+Stability categories:
+A B C D E F
+
+Wind direction categories:
+N NNE NE ENE E ESE SE SSE S SSW SW WSW W WNW NW NNW
+
+Wind speed categories:
+1: 0.0 - 1.6 m/s
+2: 1.6 - 3.4 m/s
+3: 3.4 - 5.6 m/s
+4: 5.6 - 8.3 m/s
+5: 8.3 - 10.9 m/s
+6: 10.9 - 200.0 m/s
+
+Roughness length (z0) used to adjust stability category determination: 40.0
+
+Non-standard wind measurement height (not 10 m) used to adjust stability category determination: 11.5
+
+Wind speeds will NOT be estimated at 10 m from power law, even though the measurement height is not 10 m
+
+Reading LANL file: ta53-15-2025.csv
+
+Build list of all possible 15 min times
+
+Calculate how much data is being used for each year:
+    2025  93.8% of possible 15 min times is being used
+
+----------------------------
+Summary of data found
+----------------------------
+35040 total possible 15 min times over the period of the data file.
+34508 times with data found, 98.48% of possible
+0 duplicate times found, 0.00% of found times
+1619 times with flagged data skipped, 4.69% of found times
+14 times with bad/out of range data, 0.04% of found times
+0 times ignored (wrong time of day or month), 0.00% of found times
+32875 times used to create STAR file, 95.27% of found times
+
+----------------------------------------------------------------------------------------
+Calculate frequencies for each combination of wind direction/stability class/wind speed:
+----------------------------------------------------------------------------------------
+
+Frequency by stability class:
+D: 0.49319
+E: 0.27233
+F: 0.07454
+C: 0.06828
+A: 0.05894
+B: 0.03263
+
+Frequency by wind direction:
+SSW: 0.13020
+S: 0.10907
+SW: 0.09427
+W: 0.08723
+WSW: 0.07723
+SSE: 0.05923
+WNW: 0.05544
+NNE: 0.05135
+N: 0.04941
+NE: 0.04905
+ENE: 0.04768
+E: 0.04385
+NNW: 0.03984
+NW: 0.03880
+SE: 0.03408
+ESE: 0.03318
+
+Frequency by wind speed:
+2 (1.6-3.4 m/s): 0.41296
+3 (3.4-5.6 m/s): 0.28391
+1 (0.0-1.6 m/s): 0.20100
+4 (5.6-8.3 m/s): 0.08468
+5 (8.3-10.9 m/s): 0.01511
+6 (10.9-200.0 m/s): 0.00225
+
+Maximum frequency: 0.03681 at category: S 3 D
+
+Total sum of all frequencies: 0.99950
+
+Simple depiction of frequencies:
+   (single digits are % of total, . is < 1%, + is >= 10%)
+
+Stability Class: A
+     ------
+N   |..    |
+NNE |..    |
+NE  |..    |
+ENE |1.    |
+E   |1.    |
+ESE |..    |
+SE  |..    |
+SSE |..    |
+S   |..    |
+SSW |..    |
+SW  |..    |
+WSW |..    |
+W   |..    |
+WNW |..    |
+NW  |..    |
+NNW |..    |
+     ------
+
+Stability Class: B
+     ------
+N   |..    |
+NNE |..    |
+NE  |...   |
+ENE |...   |
+E   |..    |
+ESE |..    |
+SE  |..    |
+SSE |..    |
+S   |...   |
+SSW |...   |
+SW  |..    |
+WSW |...   |
+W   |..    |
+WNW |..    |
+NW  |..    |
+NNW |..    |
+     ------
+
+Stability Class: C
+     ------
+N   |....  |
+NNE |...   |
+NE  |.1.   |
+ENE |.1.   |
+E   |.1.   |
+ESE |.1.   |
+SE  |.1.   |
+SSE |.1.   |
+S   |.1.   |
+SSW |...   |
+SW  |...   |
+WSW |...   |
+W   |...   |
+WNW | ...  |
+NW  |....  |
+NNW |....  |
+     ------
+
+Stability Class: D
+     ------
+N   |111.. |
+NNE |111...|
+NE  |11..  |
+ENE |.1... |
+E   |.1..  |
+ESE |.1..  |
+SE  |.1... |
+SSE |.111. |
+S   |.242..|
+SSW |.232..|
+SW  |.121..|
+WSW |.111..|
+W   |.121..|
+WNW |.111..|
+NW  |..1...|
+NNW |.11.. |
+     ------
+
+Stability Class: E
+     ------
+N   |11.   |
+NNE |...   |
+NE  |...   |
+ENE |...   |
+E   |...   |
+ESE |...   |
+SE  |...   |
+SSE |...   |
+S   |.1.   |
+SSW |.23   |
+SW  |.22   |
+WSW |.12   |
+W   |.12   |
+WNW |.11   |
+NW  |.1.   |
+NNW |11.   |
+     ------
+
+Stability Class: F
+     ------
+N   |..    |
+NNE |..    |
+NE  |..    |
+ENE |..    |
+E   |..    |
+ESE |..    |
+SE  |..    |
+SSE |..    |
+S   |..    |
+SSW |..    |
+SW  |..    |
+WSW |.1    |
+W   |.1    |
+WNW |.1    |
+NW  |..    |
+NNW |..    |
+     ------
+
+Writing to STAR file: ta53-2025.str
+
+----------------------------
+Summary
+----------------------------
+../../tower2star.py -windheight 11.5 -o ta53-2025.str ta53-15-2025.csv
+Met input data file: ta53-15-2025.csv
+Assumed default roughness of 40.0 cm
+Used custom wind measurement height of 11.5 m
+Wind speeds were NOT estimated at 10 m from power law, even though the measurement height is not 10 m
+Output file written with a custom name: ta53-2025.str
+
+ ../../tower2star.py completed.

@@ -96,6 +96,7 @@ tablesAll = ['dat1min', 'dat10min', 'dat15min', 'dat24hr',
              'DataStats', 'DataWindVec',
              'opsMonitor',
              'csat']
+tablesCollection = ['csat']
 tableFragments['dat15min'] = ['header']
 tableFragments['dat24hr'] = ['header']
 tableFragments['dat1min'] = ['header']
@@ -113,7 +114,8 @@ sections2 = ['subroutines', 'program', 'scan']
 fragments['subroutines'] = ['header']
 fragments['program'] = ['header']
 fragments['scan'] = ['header']
-sections3 = ['slow', 'end']
+sections3 = ['endscan', 'end']
+fragments['endscan'] = ['footer']
 fragments['slow'] = ['header', 'footer']
 fragments['end'] = ['footer']
 
@@ -240,7 +242,8 @@ with open(codeFile, 'w') as codeOut:
                         fragmentText = fragmentFile.read()
                         codeOut.write('\n')    
                         codeOut.write(fragmentText)
-                codeOut.write('EndTable\n')
+                if table not in tablesCollection:
+                    codeOut.write('EndTable\n')
 
     # ----------------
     # Bottom sections.
@@ -274,8 +277,9 @@ with open(codeFile, 'w') as codeOut:
     codeOut.write(comment)
     codeOut.write('\n')    
     for table in tables:
-        callTable = '    CallTable ' + table + '\n'
-        codeOut.write(callTable)
+        if table not in tablesCollection:
+            callTable = '    CallTable ' + table + '\n'
+            codeOut.write(callTable)
     # --------------------
     # End of main section.
     # --------------------

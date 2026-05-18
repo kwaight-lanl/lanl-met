@@ -237,7 +237,9 @@ else:
 # ---------------------------------------
 # Input and output data file information.
 # ---------------------------------------
-columnDateTime = 'Date/Time'
+#columnDateTime = 'Date/Time'
+columnDateTime1 = 'datetime' # From current Data Requests
+columnDateTime2 = 'DateTime' # From WMDC
 columnWindSpeed1 = 'spd1'
 columnWindDir1 = 'dir1'
 columnStdDevW1 = 'sdw1'
@@ -311,17 +313,28 @@ nDiag = 0
 with open(metFile, 'r') as infile:
     towerData = csv.DictReader(infile)
     for row in towerData:
+        #print('row:', row)
+        try:
+            row[columnDateTime1]
+            columnDateTime = columnDateTime1
+        except KeyError:
+            try:
+                row[columnDateTime2]
+                columnDateTime = columnDateTime2
+            except KeyError:
+                print('Datetime column header must be either', columnDateTime1, 'or', columnDateTime2)
+                sys.exit(1)
         if (row[columnDateTime] and # Should be at least these fields.
             row[columnWindSpeed1] and
             row[columnStdDevW1] and
             row[columnSWDown] and
-            (re.search(r'^\d+-\d+-\d+ \d+:\d+:\d+', row[columnDateTime]) or
+            (re.search(r'^\d+-\d+-\d+ \d+:\d+', row[columnDateTime]) or
              re.search(r'^\d+/\d+/\d+ \d+:\d+', row[columnDateTime]))):
             # This should be a data line (ignore header lines).
             #print('row[0]:', row[columnDateTime]) #ktw
             try:
                 # Try the default Weather Machine formatted date.
-                dt = datetime.strptime(row[columnDateTime], "%Y-%m-%d %H:%M:%S")
+                dt = datetime.strptime(row[columnDateTime], "%Y-%m-%d %H:%M")
             except:
                 # Try a datalogger formatted date.
                 dt = datetime.strptime(row[columnDateTime], "%m/%d/%Y %H:%M")
