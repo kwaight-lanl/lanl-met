@@ -12,7 +12,7 @@ header footer . .
 Towers (code specific to one tower, e.g. wiring info, port assignments):
 TA16B.txt  TA54B.txt  TA63.txt
 TA49.txt   TA54.txt   TA6.txt
-TA53.txt   TA5.txt    NCOM.TXT
+TA53.txt   TA5.txt    NCOM.txt
 TA68.txt . .
  
 Instruments:

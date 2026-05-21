@@ -1,0 +1,621 @@
+'
+'CR3000-Model datalogger
+'
+'
+'=================
+'HEADER
+'=================
+'Program Title:  MetTrailersDataCollectionProg-R4_05022023_.CR3
+'
+'This program is for the Trailered 10-Meter Tilt Towers
+'
+'R1-Updated April 13, 2023 addedBattery Voltage Monitoring.
+'R2: Is the addition of the Aspiration Fans RPM Feedback &
+'Battery Voltage Monitoring.
+'R3-1:  Went Thru and updated Hardware References/Callouts. (gts)
+'R4: Working on correcting data column labels for Fan Motor RPMs/Hz.
+'
+'
+'
+'
+'######################Declaration Section###########################
+'####################################################################
+'##################### Declare Variables ###########################
+'####################################################################
+'The Standard Program is expecting trig numbers in degress (as opposed to Radians)
+'changing the output to AngleDegrees.
+AngleDegrees
+'
+Const PScan=3  'Enter/Entered program execution interval in seconds
+'
+'--------------------
+'Battery Power Status
+'--------------------
+Public BattV, 
+Units BattV=Volts, 
+'
+'--------------------
+'Aspiration Fan RPMs
+'--------------------
+Public FanLvl1_Hz
+Public FanLvl2_Hz
+Units FanLvl1_Hz=Hz
+Units FanLvl2_Hz=Hz 
+'
+'
+'--------------
+'wind-horiz-1
+'--------------
+'  Wiring--RMYoung 05305-AQ Wind Speed & Direction Sensor (1)
+'    1H:  HWDir Signal Yellow
+'    Ground:  WSpd reference Green
+'    Ground:  Cable Shield White
+'    Ground:  WDir reference Black
+'    VX1:  HWDir Excite Blue
+'    P1:  HWspd Signal Red
+Public HWSpd1_ms
+Public HWDir1_deg
+Units HWSpd1_ms=meters/second
+Units HWDir1_deg=degrees
+'
+' Maximum Horizontal Winds Speed & Time Measured
+Public HWSpd1Max24Hr, HWDir1Max24Hr,HW1Max24HrTime(9)
+'
+' Minimum Horizontal Wind Speed & Time Measured
+Public HWSpd1_1min, HWDir1_1min, HWTime1_1min(9)
+Public HWSpd1_max1min, HWDir1_max1min, HWTime1_max1min(9)
+
+'MaxGustToday - Maximum wind gust since midnight (speed at level 1 only), updated
+Public MaxGustToday
+Units MaxGustToday = meters/second
+'
+'
+'--------------
+'20Ft Level Horizontal Wind Speed (Specific to Fuel Moisture) wind-horiz-20ft
+'--------------
+Public WSpd20ft
+Public WDir20ft
+Units WSpd20ft=meters/second
+Units WDir20ft=degrees
+Public WSpd20ft_max24Hr, WDir20ft_max24Hr, WSpd20ft_max24HrTime(9)
+'
+'
+'--------------
+'Vertical Wind Speed Mechanical wind-vert-1
+'--------------
+'  Wiring--RMYoung 27106T Wind Speed Sensor (1)
+'    3H:  VWspd Signal Red
+'    Ground:  WSpd reference Black
+'    Ground:  Cable Shield Clear?
+Public VWSpd1_ms
+Units VWSpd1_ms=meters/second
+'
+'--------------
+'Level-0 Air Temp AND RH-0-1 Measurements
+'--------------
+'  Wiring--RMYoung 41382 #1 Air Temp & RH Sensor 0-1 V Output
+'    4H: Air Temp Signal Red
+'    4L: RH Signal Green
+'    AG: Signal Reference Brown
+'    +PWR: Power White
+'    PWR REF: Power Ground Black
+'    G: Shield Black
+Public AirTemp1_DegC, AirTemp2_DegC
+Units AirTemp1_DegC=Deg C
+Units AirTemp2_DegC=Deg C
+'--------------
+'RH Measurement rh-0-1
+'--------------
+Public RH_pct1
+Public RH_pct2
+Units RH_pct1=%
+Units RH_pct2=%
+'
+'
+'--------------
+'Fuel Moisture Monitoring Station, fuelm-10
+'--------------
+'Wiring--CS506/CS205/107L Fuel Moisture Probe
+'    Ground:  Clear
+'    13H(SE 25):  Signal- Green
+'    G:  Power Ground - Black
+'    C5:  Control - Orange
+'    12V:  Power (+) - Red
+'
+'Wiring--Fuel Temp (107 Sensor)
+'     13L(SE26):  Signal - Red
+'    Ground:  Purple
+'    Ground:  Clear
+'    VX1:  Excitation -Black
+Public FuelM10Hr_uS
+Public FuelM10Hr_prct
+Public FuelTempC
+Units FuelM10Hr_uS=microSec
+Units FuelM10Hr_prct=%
+Units FuelTempC=DegC
+'--------------
+'fuelm-1
+'--------------
+Public AirTemp1_DegF
+Public EMC, FuelM1Hr_prct
+Units FuelM1Hr_prct=%
+
+'--------------
+'81000 Ultrasonic Anemometer (RM-Young)
+'--------------
+' Wiring--RM Young 81000 (wired for Voltage Signal Output)
+'  12V-2:      Power to Sensor (Red)
+'  G:          Sensor Power Ground (White & Black)
+'  6H: (SE11)  V1 Wind Speed  (Green)
+'  6L: (SE12)  V2 Wind Direction (Blue)
+'  7H: (SE13)  V3 Elevation (Yellow)
+'  7L: (SE14)  V4 Temperature (Orange)
+'  AG          VRef (Brown)
+Public WSpd81000
+Public WDir81000
+Public TempC81000
+Public VertWS81000
+Public u81000 'Changed setting to get u-v-w instead of 3D speed-azimuth-elevation.
+Public v81000
+Public TempK81000
+Units WSpd81000 = m/s
+Units WDir81000 = degrees
+'
+'--------------------------------------------------------
+' Aspiration Shields W/Fans (includes RPM Output)
+'--------------------------------------------------------
+' Wiring--L-0, 43502 RMYoung Aspiration Shield & Fan Motor
+'  12V-2:      Power to fan motor (Red)
+'  G:          Power Ground/Return (Black)
+'  P3:         Fan Tachometer RPM(Yellow)
+'
+'
+' Wiring--L-1, 43502 RMYoung Aspiration Shield & Fan Motor
+'  12V-2:      Power to fan motor (Red)
+'  G:          Power Ground/Return (Black)
+'  P4:         Fan Tachometer RPM(Yellow)
+'
+'
+'
+'
+'====================================================================
+'====================================================================
+'------TABLES---------------TABLES---------------TABLES---------
+'====================================================================
+'====================================================================
+'
+'-------------------------------------------------------------------
+'-------------------------------------------------------------------
+'15-Minute Data Table-----15-Minute Data Table------15-Minute Data Table
+'-------------------------------------------------------------------
+'-------------------------------------------------------------------
+DataTable(Dat15min,True,-1)
+  DataInterval(0,15,Min,10)
+'
+''--------------
+'Battery Voltage 'BattV'
+'--------------
+  Average(1,BattV,FP2,False) 'Avg Battery Voltage
+  FieldNames("BattV_AvgVolt")
+'
+'--------------
+'wind-horiz-1
+'--------------
+  WindVector (1,HWSpd1_ms,HWDir1_deg,FP2,False,0,0,1)  'RMY05305 (1) Sensor
+  FieldNames("HWSpd1_ms_Avg,HWDir1_deg_Avg")
+  StdDev(1,HWSpd1_ms,FP2,False)  'StdDev RMY05305 (1) Wind Speed
+  FieldNames("HWSpd1_ms_Std")
+'--------------
+'wind-horiz-20ft
+'--------------
+  WindVector (1,WSpd20ft,WDir20ft,FP2,False,0,0,1)  'RMY05305 (1) Sensor
+  FieldNames("WSpd20ft_Avg,WDir20ft_Avg")
+'--------------
+'wind-vert-1
+'--------------
+  Average(1,VWSpd1_ms,FP2,False)  'Avg RMY27106T (1) Wind Speed
+  FieldNames("VWSpd1_ms_Avg")
+  StdDev(1,VWSpd1_ms,FP2,False)  'StdDev RMY27106T (1) Wind Speed
+  FieldNames("VWSpd1_ms_Std")
+'--------------
+'temp-0-1
+'--------------
+  Average(1,AirTemp1_DegC,FP2,False)'Avg 41382 RMYoung Probe(1) AirTemp
+  FieldNames("AirTemp1_AVGDegC"
+  Average(1,AirTemp2_DegC,FP2,False)'Avg 41382 RMYoung Probe(2) AirTemp
+  FieldNames("AirTemp2_AVGDegC")
+'--------------
+'rh-0-1
+'--------------
+  Average (1,RH_pct1,FP2,False)
+  Average (1,RH_pct2,FP2,False)
+'--------------
+'fuelm-10
+'--------------
+  Average (1,FuelM10Hr_prct,FP2,False)
+'--------------
+'fuelm-1
+'--------------
+  Average (1,FuelM1Hr_prct,FP2,False)
+  Average (1,FuelTempC,FP2,False)
+'--------------
+'81000
+'--------------
+  StdDev(1,WSpd81000,FP2,False) 'StdDev 81000(1) Wind Speed
+  WindVector (1,WSpd81000,WDir81000,FP2,False,0,0,1) 
+  FieldNames("spd81000,dir81000")
+  Average (1,VertWS81000,FP2,False)
+  FieldNames ("w81000")
+  StdDev(1,VertWS81000,FP2,False)
+  FieldNames ("sdw81000")
+'--------------
+'Aspiration Fans RPMs
+'--------------
+  Average (1,FanLvl1_Hz,FP2,False)'Level-0 Air Temp Aspiration Fan RPMs
+  FieldNames("FanLvl1_AvgRPM)")'Level 0 & 1 Aspiration Fans RPMs.
+  Average (1,FanLvl2_Hz,FP2,False)'Level-1 Air Temp Aspiration Fan RPMs
+  FieldNames("FanLvl2_AvgRPM")'Level 0 & 1 Aspiration Fans RPMs.
+  
+EndTable
+'End of 15-Min Data Table-----End of 15-Min Data Table-----
+'End of Dat15Min Table-------------End of Dat15Min Table-----
+'
+'-------------------------------------------------------------
+'-------------------------------------------------------------
+'------24-HOUR DATA TABLE------24-HOUR DATA TABLE-------------
+'-------------------------------------------------------------
+'-------------------------------------------------------------
+DataTable(Dat24Hr,True,-1)
+  DataInterval(0,24,Hr,10)
+'
+'---------------------
+'Battery Voltage BattV
+'---------------------
+  Minimum(1,BattV,FP2,False,False)
+  FieldNames("BattV_MinVolt")
+'
+'
+'--------------
+'wind-horiz-1
+'--------------
+  Average(1,HWSpd1_ms,FP2,False)  ' Avg RMY-05305AQ (1) Wind Speed
+'--------------
+'rh-0-1
+'--------------
+  Average (1,RH_pct1,FP2,False)
+  Average (1,RH_pct2,FP2,False)
+'--------------
+'fuelm-10
+'--------------
+  Average (1,FuelM10Hr_prct,FP2,False)
+  ' Average (1,FuelM10Hr_prct,FP2,False)
+  Minimum (1,FuelM10Hr_prct,FP2,False,False)
+  Maximum (1,FuelM10Hr_prct,FP2,False,False)
+
+'--------------
+'fuelm-1
+'--------------
+  Average (1,FuelM1Hr_prct,FP2,False)
+'--------------
+'81000
+'--------------
+  Average (1,WSpd81000,FP2,False)
+  StdDev(1,WSpd81000,FP2,False) 'StdDev 81000 (1) Wind Speed
+  WindVector (1,WSpd81000,WDir81000,FP2,False,0,0,4)  '81000 (1) Sensor
+  Average (1,VertWS81000,FP2,False)
+  StdDev(1,VertWS81000,FP2,False)
+EndTable
+'-----End of 24-Hour Data Table-----End of 24-Hour Data Table------
+'-----End of Dat24Hr Data Table-----End of Dat24Hr Data Table------
+'
+'
+'----------------------------------------------------------------------
+'----------------------------------------------------------------------
+'----- Data Table: "Dat1min" , Interval: 1minute ---------------------
+'----------------------------------------------------------------------
+'----------------------------------------------------------------------
+' *Note: Dat1min table-readings used to compute speed,direction&time of
+' max sustained 1min gust using the WindVector instruction 
+'for the RMY-05305AQ (1) Wind Sensor.
+DataTable(Dat1min,True,48)  '*Note: data table size fixed to 48 records
+  DataInterval(0,1,Min,10)
+'--------------
+'wind-horiz-1
+'--------------
+  WindVector (1,HWSpd1_ms,HWDir1_deg,FP2,False,0,0,0)  
+  'Wind Vector RMY-05305AQ (1) Sensor
+  '  FieldNames("HWSpd1_AVGms,HWDir1_AVGdeg,HWDir1_StdDev")
+  Sample (2,HWTime1_1min(4),FP2)  'RMY05305 (1) time HH,MM
+EndTable
+' End of Dat1min Table---End of Dat1min Table---------------
+'-------------------------------------------------------------------
+'
+'
+'
+'
+'
+'*********************************************************************
+'*********************************************************************
+'----Public15 minute table- ----Public15 minute table- 
+'-storing values being sent to Public table every 15 min.
+'*********************************************************************
+'=====================================================================
+'
+DataTable (Public15,True,1)
+  DataInterval (0,15,Min,10)
+'--------------
+'wind-horiz-1
+'--------------
+  Maximum (1,HWSpd1_ms,FP2,HWSpd1_ms=NAN,False)
+EndTable
+'--------------
+'header
+'--------------
+DataTable(Dat10min,True,-1)
+  DataInterval(0,10,Min,10)
+'--------------
+'wind-horiz-1
+'--------------
+  WindVector (1,HWSpd1_ms,HWDir1_deg,FP2,False,0,0,1)'RMY-05305AQ(1)
+  FieldNames("HWSpd1_ms_Avg,HWDir1_deg_Avg")
+  StdDev(1,HWSpd1_ms,FP2,False)  'StdDev RMY05305 (1) Wind Speed
+  FieldNames("HWSpd1_ms_Std")
+'--------------
+'wind-horiz-20ft
+'--------------
+  WindVector (1,WSpd20ft,WDir20ft,FP2,False,0,0,1)  'RMY-05305AQ(1)
+  FieldNames("WSpd20ft_Avg,WDir20ft_Avg")
+'--------------
+'wind-vert-1
+'--------------
+  Average(1,VWSpd1_ms,FP2,False)  'Avg RMY27106T (1) Wind Speed
+  FieldNames("VWSpd1_ms_Avg")
+  StdDev(1,VWSpd1_ms,FP2,False)  'StdDev RMY27106T (1) Wind Speed
+  FieldNames("VWSpd1_ms_Std")
+'--------------
+'temp-0-1
+'--------------
+  Average(1,AirTemp1_DegC,FP2,False)  'Avg 41382(1) Air Temp
+  FieldNames("AirTemp1_AVGDegC")
+  Average(1,AirTemp2_DegC,FP2,False)  'Avg 41382(2) Air Temp
+  FieldNames("AirTemp2_AVGDegC")
+'--------------
+'rh-0-1
+'--------------
+  Average (1,RH_pct1,FP2,False) 'Avg 41382(1) RH
+  Average (1,RH_pct2,FP2,False) 'Avg 41382(2) RH
+'--------------
+'fuelm-10
+'--------------
+  Average (1,FuelM10Hr_prct,FP2,False)
+'--------------
+'fuelm-1
+'--------------
+  Average (1,FuelM1Hr_prct,FP2,False)'1-Hr Fuel Moisture
+  Average (1,FuelTempC,FP2,False)'1-Hr Fuel Moisture Temp
+'--------------
+'81000
+'--------------
+  StdDev(1,WSpd81000,FP2,False) 'StdDev 81000(1) Wind Speed
+  WindVector (1,WSpd81000,WDir81000,FP2,False,0,0,1) 
+  FieldNames("spd81000,dir81000")
+  Average (1,VertWS81000,FP2,False)
+  FieldNames ("w81000")
+  StdDev(1,VertWS81000,FP2,False)
+  FieldNames ("sdw81000")
+EndTable
+' End of Public15min Table---End of Public15min Table---------------
+'-------------------------------------------------------------------
+'
+'
+'
+'====================================================================
+'====================================================================
+'---------------MAIN-PROGRAM----HEADER-----------
+'====================================================================
+'====================================================================
+'
+BeginProg
+  Scan(3,Sec,1,0)
+
+'--------------
+'Battery Voltage: Battery Voltage Measurement 'BattV'
+'--------------
+Battery (BattV)
+'
+'
+'
+'---------------
+'Aspiration Fan RPM Pulse Measurements:  
+'---------------
+PulseCount (FanLvl1_Hz,1,3,0,1,1,0)
+PulseCount (FanLvl2_Hz,1,4,0,1,1,0)
+'
+'
+'--------------
+'wind-horiz-1
+'--------------
+    '  RMYoung 05305-AQ Wind Speed & Direction Sensor (1)
+    '  Wind Speed & Direction Sensor measurements 'HWSpd1_ms' and 'HWDir1_deg'
+    PulseCount(HWSpd1_ms,1,1,1,1,0.1024,0)
+    BrHalf(HWDir1_deg,1,mV1000,1,1,1,1000,False,20000,_60Hz,355,0)
+    If HWDir1_deg>=360 OR HWDir1_deg<0 Then HWDir1_deg=0
+
+    ' Determine the HWSpeed, Direction & Time of Max Gust 4-levels
+    ' for a 24Hr period
+    If HWSpd1_ms > HWSpd1Max24Hr Then
+      HWSpd1Max24Hr = HWSpd1_ms
+      HWDir1Max24Hr = HWDir1_deg
+      RealTime (HW1Max24HrTime())
+    EndIf
+
+    ' Read Time every 1minute ---------------------------------
+    If TimeIntoInterval (0,1,Min) Then
+      RealTime (HWTime1_1min())
+    EndIf
+    '
+    '--------------------------------------------------------------------
+    'Call Output Tables --------------------------------------------------
+    CallTable Dat1min
+    ' Redirect DatTable "Dat1min" variables to program variables
+    HWSpd1_1min = Dat1min.HWSpd1_ms_WVc(1,1)
+    HWDir1_1min = Dat1min.HWSpd1_ms_WVc(2,1)
+    '----------------------------------------------------------------------
+    ' Determine the HWSpeed, HWDirection & Time of Max 1min sustained gust 1-level
+    ' for a 24Hr period and store into program varialbes for a 24Hr period
+    If HWSpd1_1min > HWSpd1_max1min Then
+      HWSpd1_max1min = HWSpd1_1min
+      HWDir1_max1min = HWDir1_1min
+      HWTime1_max1min(4) = HWTime1_1min(4)
+      HWTime1_max1min(5) = HWTime1_1min(5)
+    EndIf
+
+    If IfTime(0,15,min) Then
+      If Public15.HWSpd1_ms_MAX>MaxGustToday Then
+        MaxGustToday=Public15.HWSpd1_ms_MAX
+      EndIf
+    EndIf
+'--------------
+'wind-horiz-20ft
+'--------------
+    PulseCount(WSpd20ft,1,2,1,1,0.1024,0)
+    BrHalf(WDir20ft,1,mV1000,1,1,1,1000,False,20000,_60Hz,355,0)
+    If WDir20ft>=360 OR WDir20ft<0 Then WDir20ft=0
+
+    ' Determine the HWSpeed, Direction & Time of Max Gust 4-levels
+    ' for a 24Hr period
+    If WSpd20ft > WSpd20ft_max24Hr Then
+      WSpd20ft_max24Hr = WSpd20ft
+      Wdir20ft_max24Hr = WDir20ft
+      RealTime (WSpd20ft_max24HrTime())
+    EndIf
+'--------------
+'wind-vert-1
+'--------------
+    '  RMYoung 27106T Wind Speed Sensor (1)
+    '  Wind Speed Sensor measurements 'VWSpd1_ms'
+    VoltSe(VWSpd1_ms,1,mV5000,5,True,0,_60Hz,0.0225,0)
+'--------------
+'wind-horiz-1-footer
+'--------------
+    CallTable Dat15min
+    CallTable Dat24Hr
+    CallTable Dat1min
+    CallTable Public15
+    
+    ' At the beginning of a new day reset 24Hr variables
+    If TimeIntoInterval (0,1,Day) Then
+      HWSpd1_max1min = 0
+      HWDir1_max1min = 0
+      HWTime1_max1min(4) = 0
+      HWTime1_max1min(5) = 0
+
+      HWSpd1Max24Hr=0
+      HWDir1Max24Hr=0
+      HW1Max24HrTime(4)=0  'hour
+      HW1Max24HrTime(5)=0  'minute
+
+      MaxGustToday=0
+    EndIf
+'--------------
+'wind-horiz-20ft-footer
+'--------------
+    CallTable Dat10min
+    If TimeIntoInterval (0,1,Day) Then
+      WSpd20ft_max24Hr=0
+      WDir20ft_max24Hr=0
+      WSpd20ft_max24HrTime(4)=0  'hour
+      WSpd20ft_max24HrTime(5)=0  'minute
+    EndIf
+'
+'--------------
+'temp-0-1
+'--------------
+    '  RMYoung 41382 Combination Air Temp & RH Sensor(Level-0) Measurements 
+    'AirTemp1_DegC' Air Temp Sensor(1)
+    VoltSe (AirTemp1_DegC,1,mV1000,7,1,0,250,.1,-50)
+    '  RMYoung 41342 or 41382 Combination Air Temp & RH Sensor(Level-1)
+    '  measurements 'AirTemp2_DegC'
+    VoltSe (AirTemp2_DegC,1,mV1000,9,1,0,250,.1,-50)
+'--------------
+'rh-0-1
+'--------------
+    VoltSe (RH_pct1,1,mV1000,8,1,0,250,.1,0)
+    VoltSe (RH_pct2,1,mV1000,10,1,0,250,.1,0)
+'--------------
+'fuelm-10
+'--------------
+    'CS506/CS205 Fuel Moisture Assembly(constant power) measurements
+    'Measurements-- 'FuelM_percent' and 'FuelM_uS'
+    PortSet(5,1)' power on the fuel moisture sensor
+    PeriodAvg(FuelM10Hr_uS,1,mV1000,25,0,0,100,10,1,0)
+    If FuelM10Hr_uS <= 17.7 Then
+      FuelM10Hr_prct=7.6298*FuelM10Hr_uS-130.0904
+    Else
+      FuelM10Hr_prct=0.0406*FuelM10Hr_uS^2+3.7685*FuelM10Hr_uS-73.7974
+    EndIf
+    PortSet(5,0)
+    '----------------------------------------------------------------
+    'CS205 Fuel Temperature Sensor measurement
+    'Therm107 (FuelTempC,1,26,Vx4,0,_60Hz,1.0,0)
+    Therm107 (FuelTempC,1,26,Vx1,0,_60Hz,1,0)
+'--------------
+'fuelm-1
+'--------------
+    ' Source of previous calculation of EMC and 1 hr fuel moisture is 
+    ' unknown, so switched to calculations from 
+    ' Cohen and Deeming reference. 
+    ' The differences in 1 hr fuel moisture were found to be small.
+    ' December 2021 - Ken Waight
+
+    ' New calculation of EMC and 1 hr fuel moisture.
+    ' Cohen, J.D. and J.E. Deeming, 1982?: 
+    ' The National Fire Danger Rating System: basic equations. 
+    ' General Technical Report PSW-82, U.S. Forest Service, 
+    ' Pacific Southwest Forest and Range Experimental Station.
+    ' December 2021 - Ken Waight
+    '
+    AirTemp1_DegF = (1.8*AirTemp1_DegC)+32
+    If RH_pct1 < 10 Then
+      EMC = 0.03229 + 0.281073*RH_pct1 - 0.000578*AirTemp1_DegF*RH_pct1
+    ElseIf RH_pct1>=10 AND RH_pct1 < 50 Then
+      EMC = 2.22749 + 0.160107*RH_pct1 - 0.014784*AirTemp1_DegF
+    ElseIf RH_pct1>= 50 Then
+      EMC = 21.0606 + 0.005565*RH_pct1*RH_pct1 - 0.00035*RH_pct1*AirTemp1_DegF - 0.483199*RH_pct1
+    EndIf
+    FuelM1Hr_prct = (4.12*EMC+FuelM10Hr_prct)/5.0
+
+'--------------
+'81000
+'--------------
+   'Changed instrument settings so that voltage output format=1 (u-v-w)
+   ' instead of 2 (3D speed-azimuth-elevation).
+    VoltSe (u81000,1,mV5000,11,1,0,_60Hz,0.02,-50)
+    VoltSe (v81000,1,mV5000,12,1,0,_60Hz,0.02,-50)
+    VoltSe (VertWS81000,1,mV5000,13,1,0,_60Hz,0.02,-50)
+    VoltSe (TempK81000,1,mV5000,14,1,0,_60Hz,0.02,220)
+    TempC81000 = TempK81000 - 273.15
+   'Temp relationship is different than u-v-w
+
+    'Calculate horizontal wind speed from u and v.
+    WSpd81000 = SQR(u81000*u81000 + v81000*v81000)
+
+    'Calculate wind direction from u and v.
+    if u81000 = 0.0 and v81000 = 0.0 then
+        WDir81000 = 0.0
+    elseif u81000 = 0.0 and v81000 > 0.0 then
+        WDir81000 = 180.0
+    elseif u81000 = 0.0 and v81000 < 0.0 then
+        WDir81000 = 0.0
+    else
+        WDir81000 = ATN2(u81000, v81000)
+    EndIf
+
+  NextScan
+EndProg
+'
+'====================================================
+'FOOTER INFORMATION
+'====================================================
+'
+'
