@@ -78,13 +78,13 @@ else:
 # Input and output data file information.
 # ---------------------------------------
 columnStation   = 'Station'
-#columnDateTime1 = 'Date/Time' # Data request from old yellow Weather Machine.
 columnDateTime1 = 'DateTime' # WMDC download
 columnDateTime2 = 'dts'       # Data request from current Weather Machine.
 columnName = {}
-columnName['spd1'] = 'spd1'
+columnName['spd1'] = 'SPD1 (MS)'
 columnName['temp0'] = 'Temp0  (C)'
-columnName['rh'] = 'rh'
+columnName['rh'] = 'RH'
+columnName['press'] = 'PRES  (MB)'
 #columnName['dewp'] = 'dewp'
 #columnName['swdn'] = 'swdn'
 #columnName['swup'] = 'swup'
@@ -178,15 +178,24 @@ with open(metFile, 'r') as infile:
                 T2mC = None
             try:
                 Td2mC = float(row['dewp'])
-            except ValueError:
-                Td2mC = None
+            except KeyError:
+                try:
+                    rh = float(row['RH'])
+                    print('rh:', rh) #ktw
+                    print('T2mC:', T2mC) #ktw
+                    Td2mC = wbgt.Rh2Td(T2mC, rh)
+                    print('Td2mC:', Td2mC) #ktw
+                except:
+                    print('Td calc failed?') #ktw
+                    sys.exit()
+                    Td2mC = None
             try:
-                wspd10m = float(row['SPD1'])
+                wspd10m = float(row['SPD1 (MS)'])
             except ValueError:
                 wspd10m = None
             try:
-                pSfc = 100.0 * float(row['press'])
-            except ValueError:
+                pSfc = 100.0 * float(row['PRESS  (MBAR)'])
+            except KeyError:
                 pSfc = None
             try:
                 swdn = float(row['swdn'])
@@ -195,7 +204,7 @@ with open(metFile, 'r') as infile:
                 else:
                     # Assume no clouds for night, since WBGT probably isn't relevant anyway.
                     cloudFrac = 0.0
-            except ValueError:
+            except KeyError:
                 swdn = None
                 cloudFrac = 0.0
             # Estimate the wind speed at a different height than observed, but keep it in the wspd10m variable.
