@@ -4,6 +4,7 @@
 #   meteorological measurements. J. Occup. Env. Hygiene, 5, 645-655.
 # Ken Waight / May 2025
 
+import sys
 from datetime import datetime
 import math
 
@@ -72,7 +73,8 @@ def calc_frac_hour(dt):
 
 
 def calc_irradiances(latitude, longitude, dt,
-                     T2m, e2m, wspd10m, pSfc, cloudFrac, swdn,
+                     T2m, e2m, wspd10m, pSfc, cloudFrac,
+                     swdn, swup, lwdn, lwup,
                      verbosity):
     """
     Calculate all solar and longwave irradiances.
@@ -85,28 +87,32 @@ def calc_irradiances(latitude, longitude, dt,
     # Calculate solar downward irradiance.
     (solarDownDirect, solarDownDiffuse, 
      solarDownGlobal, solarDownGlobalClear, solarDownGlobalOvercast,
-     cloudFrac) = calc_solar_down(dt, pSfc, cloudFrac, swdn,
+     cloudFrac) = calc_solar_down(dt, pSfc,
+                                  cloudFrac, swdn,
                                   solarZenith, cosZenith, solarElevation,
                                   verbosity)
 
     # Calculate solar upward irradiance.
     solarUp = calc_solar_up(solarDownGlobal, solarDownGlobalClear, solarDownGlobalOvercast,
+                            swup,
                             verbosity)
 
     # Calculate longwave downward irradiance.
     (longwaveDown, longwaveDownClear, longwaveDownOvercast) = calc_longwave_down(T2m, e2m, cloudFrac,
+                                                                                 lwdn,
                                                                                  verbosity)
 
     # Calculate longwave upward irradiance.
     longwaveUp = calc_longwave_up(longwaveDown, solarDownGlobal,
                                   longwaveDownClear, solarDownGlobalClear,
                                   longwaveDownOvercast, solarDownGlobalOvercast,
-                                  T2m, wspd10m,
+                                  T2m, wspd10m,lwup,
                                   verbosity)
 
-    return (solarZenith, solarElevation, cosZenith, dayofyear,
+    return (solarZenith, solarElevation, cosZenith, dayofyear, 
             solarDownGlobal, solarDownDirect, solarDownDiffuse, solarUp,
-            longwaveDown, longwaveUp) 
+            longwaveDown, longwaveUp,
+            cloudFrac) 
 
 
 def calc_solar_params(latitude, longitude, dt,
@@ -183,7 +189,8 @@ def calc_solar_params(latitude, longitude, dt,
     return solarZenith, cosZenith, solarElevation, dayofyear 
 
 
-def calc_solar_down(dt, pSfc, cloudFrac, swdn,
+def calc_solar_down(dt, pSfc,
+                    cloudFrac, swdn,
                     solarZenith, cosZenith, solarElevation,
                     verbosity):
     """
@@ -194,7 +201,8 @@ def calc_solar_down(dt, pSfc, cloudFrac, swdn,
         I0            - solar constant (W/m2)
         P0            - Standard sea level pressure (Pa)
     Assumed to be present in this class.
-        cloudFrac - cloud fraction or swdn - downward solar
+        [cloudFrac - cloud fraction or 
+         swdn - downward solar, will override calculated value]
         dt      - Date/time object
     Assumes that calc_solar_params has already been called.
     Provided or calculated here:
@@ -231,9 +239,11 @@ def calc_solar_down(dt, pSfc, cloudFrac, swdn,
         solarDownDiffuseClear = 0.
         solarDownDiffuseOvercast = 0.
         solarDownGlobalOvercast = 0.
+        cloudFrac = 0.0  # Assume no clouds for night, since WBGT probably isn't relevant anyway.
         daytime = False
         return (solarDownDirect, solarDownDiffuse,
-                solarDownGlobal, solarDownGlobalClear, solarDownGlobalOvercast)
+                solarDownGlobal, solarDownGlobalClear, solarDownGlobalOvercast,
+                cloudFrac)
     elif solarZenith >= 90.0:
         # Just after sunrise or before sunset, so it's daytime,
         #   but no solar irradiance.
@@ -245,10 +255,11 @@ def calc_solar_down(dt, pSfc, cloudFrac, swdn,
         solarDownDiffuseClear = 0.
         solarDownDiffuseOvercast = 0.
         solarDownGlobalOvercast = 0.
+        cloudFrac = 0.0  # Assume no clouds for night, since WBGT probably isn't relevant anyway.
         daytime = True
         return (solarDownDirect, solarDownDiffuse,
-                solarDownGlobal, solarDownGlobalClear, solarDownGlobalOvercast)
-
+                solarDownGlobal, solarDownGlobalClear, solarDownGlobalOvercast,
+                cloudFrac)
     else:
         # Zenith angle less than 90 deg, so daytime, continue.
         daytime = True
@@ -269,6 +280,23 @@ def calc_solar_down(dt, pSfc, cloudFrac, swdn,
     solarDownGlobalClear = (0.84 * I0 * cosZenith *
                                  math.exp(-.027*(pSfc/P0)*
                                           (tL/cosZenith)))
+
+    if (cloudFrac is not None and swdn is None):
+        # Use the provided cloud fraction to estimate solarDownGlobal, etc.
+        pass
+    elif (cloudFrac is None and swdn is not None):
+        # Estimate the cloud fraction from the observed swdn and
+        #   the calculated global clear for this location and time.
+        cloudFrac = 1.0 - (swdn/solarDownGlobalClear)
+        cloudFrac = max(cloudFrac, 0.0)
+        cloudFrac = min(cloudFrac, 1.0)
+    elif (cloudFrac is not None and swdn is not None):
+        # # Use the provided cloud fraction and swdn.
+        pass
+    else:
+        print('ERROR: Must have either cloud fraction or downward solar irradiance',
+              'to estimate the other!')
+        sys.exit(1)
 
     # Calculate the airmass.
     airmass = 1. / (cosZenith+0.50572*
@@ -295,21 +323,8 @@ def calc_solar_down(dt, pSfc, cloudFrac, swdn,
                                  math.exp(-tL*vot*airmass*
                                           (pSfc/P0)))
 
-    if swdn is not None:
-        # Estimate the cloud fraction from the observed irradiance and
-        #   the calculated clear sky value for this location and time.
-        cloudFrac = 1.0 - (swdn/solarDownDirectClear)
-        cloudFrac = max(cloudFrac, 0.0)
-        cloudFrac = min(cloudFrac, 1.0)
-        solarDownDirect = swdn
-    elif cloudFrac is not None:
-        # Calculate direct irradiance for the given cloud amount.
-        solarDownDirect = ((1.0-cloudFrac) *
+    solarDownDirect = ((1.0-cloudFrac) *
                            solarDownDirectClear)
-    else:
-        print('Must have either cloud fraction or downward solar irradiance',
-              'to estimate the other!')
-        sys.exit(1)
 
     # Calculate clear sky diffuse irradiance.
     transmittance = (solarDownDirectClear /
@@ -334,6 +349,15 @@ def calc_solar_down(dt, pSfc, cloudFrac, swdn,
 
     # Calculate global irradiances.
     solarDownGlobal = solarDownDirect + solarDownDiffuse
+    solarDownGlobalCalculated = solarDownGlobal
+
+    if swdn is not None:
+        # Adjust solarDownDirect and Diffuse to produce the
+        #   provided solarDownGlobal (swdn) value.
+        if solarDownGlobalCalculated > 0.0:
+            solarDownDirect *= swdn / solarDownGlobalCalculated
+            solarDownDiffuse *= swdn / solarDownGlobalCalculated
+        solarDownGlobal = swdn
 
     # Calculate overcast global irradiance.
     solarDownGlobalOvercast = solarDownDiffuseOvercast
@@ -346,15 +370,17 @@ def calc_solar_down(dt, pSfc, cloudFrac, swdn,
         print(" Surface pressure                     : {:.1f} Pa".format(pSfc))
         print(" Air mass                             : {:.2f}".format(airmass))
         print(" Cloud fraction                       : {:.2f}".format(cloudFrac))
-        print(" Direct irradiance                    : {:.1f} W/m2".format(solarDownDirect))
-        print(" Diffuse irradiance                   : {:.1f} W/m2".format(solarDownDiffuse))
-        print(" Global irradiance                    : {:.1f} W/m2".format(solarDownGlobal))
-        print(" Clear sky direct irradiance          : {:.1f} W/m2".format(solarDownDirectClear))
-        print(" Clear sky diffuse irradiance         : {:.1f} W/m2".format(solarDownDiffuseClear))
-        print(" Clear sky global irradiance          : {:.1f} W/m2".format(solarDownGlobalClear))
-        print(" Overcast diffuse irradiance          : {:.1f} W/m2".format(solarDownDiffuseOvercast))
-        print(" Overcast global irradiance           : {:.1f} W/m2".format(solarDownGlobalOvercast))
+        print(" Clear sky direct                     : {:.1f} W/m2".format(solarDownDirectClear))
+        print(" Clear sky diffuse                    : {:.1f} W/m2".format(solarDownDiffuseClear))
+        print(" Clear sky global                     : {:.1f} W/m2".format(solarDownGlobalClear))
+        print(" Overcast diffuse                     : {:.1f} W/m2".format(solarDownDiffuseOvercast))
+        print(" Overcast global                      : {:.1f} W/m2".format(solarDownGlobalOvercast))
+        print(" Solar downward direct                : {:.1f} W/m2".format(solarDownDirect))
+        print(" Solar downward diffuse               : {:.1f} W/m2".format(solarDownDiffuse))
+        print(" Solar downward global, calculated    : {:.1f} W/m2".format(solarDownGlobalCalculated))
+        print(" Solar downward global                : {:.1f} W/m2".format(solarDownGlobal))
         print(" Daytime?                             : {:}".format(daytime))
+
 
     return (solarDownDirect, solarDownDiffuse,
             solarDownGlobal, solarDownGlobalClear, solarDownGlobalOvercast,
@@ -362,6 +388,7 @@ def calc_solar_down(dt, pSfc, cloudFrac, swdn,
 
 
 def calc_solar_up(solarDownGlobal, solarDownGlobalClear, solarDownGlobalOvercast,
+                  swup,
                   verbosity):
     """
     Calculate the upward (reflected from the surface) solar
@@ -377,7 +404,8 @@ def calc_solar_up(solarDownGlobal, solarDownGlobalClear, solarDownGlobalOvercast
            - clear sky global solar irradiance (W/m2)
         solarDownGlobalOvercast
            - overcast global solar irradiance (W/m2)
-    Provided or calculated here:
+    Optionally provided:
+        swup - upward solar, will override calculated value
     Output:
         solarUp 
            - solar upward irradiance (W/m2) with given cloud amount
@@ -385,6 +413,11 @@ def calc_solar_up(solarDownGlobal, solarDownGlobalClear, solarDownGlobalOvercast
     # Calculate the solar upward irradiance with the given cloud
     #   amount.
     solarUp = albedoSfc * solarDownGlobal
+    solarUpCalculated = solarUp
+
+    if swup is not None:
+        # Override the calculated value with the provided swup.
+        solarUp = swup
 
     # Calculate the solar upward irradiance under clear skies.
     solarUpClear = albedoSfc * solarDownGlobalClear
@@ -396,14 +429,16 @@ def calc_solar_up(solarDownGlobal, solarDownGlobalClear, solarDownGlobalOvercast
         print("\n Solar upward irradiances")
         print(" --------------------------------------------------")
         print(" Surface solar albedo                   : {:.1f}".format(albedoSfc))
-        print(" Solar upward irradiance                : {:.1f} W/m2".format(solarUp))
-        print(" Solar upward clear sky irradiance      : {:.1f} W/m2".format(solarUpClear))
-        print(" Solar upward overcast irradiance       : {:.1f} W/m2".format(solarUpOvercast))
+        print(" Solar upward clear sky                 : {:.1f} W/m2".format(solarUpClear))
+        print(" Solar upward overcast                  : {:.1f} W/m2".format(solarUpOvercast))
+        print(" Solar upward, calculated               : {:.1f} W/m2".format(solarUpCalculated))
+        print(" Solar upward                           : {:.1f} W/m2".format(solarUp))
 
     return solarUp
 
 
 def calc_longwave_down(T2m, e2m, cloudFrac,
+                       lwdn,
                        verbosity):
     """
     Calculate a set of longwave irradiances (W/m2), using the method 
@@ -414,7 +449,8 @@ def calc_longwave_down(T2m, e2m, cloudFrac,
         T             - 2 m air temperature (C)
         e             - 2 m vapor pressure (Pa)
         cloudFrac     - cloud fraction
-    Provided or calculated here:
+    Optionally provided:
+        lwdn - downward longwave, will override calculated value
     Output:
         longwaveDown
            - longwave downward irradiance (W/m2) with given 
@@ -431,17 +467,24 @@ def calc_longwave_down(T2m, e2m, cloudFrac,
     # Calculate the longwave downward irradiance with the given cloud
     #   amount.
     longwaveDown = (longwaveDownClear *
-                         (1. + 0.21*cloudFrac**2.5))
+                    (1. + 0.21*cloudFrac**2.5))
+    longwaveDownCalculated = longwaveDown
+
+    if lwdn is not None:
+        # Override the calculated value with the provided lwdn.
+        longwaveDown = lwdn
+        
 
     if verbosity > 1:
         print("\n Longwave downward irradiances")
         print(" --------------------------------------------------")
-        print(" 2 m Temperature                        : {:.1f} K".format(T2m))
-        print(" 2 m water vapor pressure               : {:.1f} Pa".format(e2m))
-        print(" Cloud fraction                         : {:.2f}".format(cloudFrac))
-        print(" Longwave downward irradiance           : {:.1f} W/m2".format(longwaveDown))
-        print(" Longwave clear sky downward irradiance : {:.1f} W/m2".format(longwaveDownClear))
-        print(" Longwave overcast downward irradiance  : {:.1f} W/m2".format(longwaveDownOvercast))
+        print(" 2 m Temperature                         : {:.1f} K".format(T2m))
+        print(" 2 m water vapor pressure                : {:.1f} Pa".format(e2m))
+        print(" Cloud fraction                          : {:.2f}".format(cloudFrac))
+        print(" Longwave clear sky downward             : {:.1f} W/m2".format(longwaveDownClear))
+        print(" Longwave overcast downward              : {:.1f} W/m2".format(longwaveDownOvercast))
+        print(" Longwave downward, calculated:          : {:.1f} W/m2".format(longwaveDownCalculated))
+        print(" Longwave downward                       : {:.1f} W/m2".format(longwaveDown))
 
     return longwaveDown, longwaveDownClear, longwaveDownOvercast
 
@@ -450,6 +493,7 @@ def calc_longwave_up(longwaveDown, solarDownGlobal,
                      longwaveDownClear, solarDownGlobalClear,
                      longwaveDownOvercast, solarDownGlobalOvercast,
                      T2m, wspd10m,
+                     lwup,
                      verbosity):
     """
     Calculate the surface temperature (K) and upward longwave 
@@ -476,7 +520,8 @@ def calc_longwave_up(longwaveDown, solarDownGlobal,
            - longwave downward irradiance (W/m2) under a clear sky
         longwaveDownOvercast
            - longwave downward irradiance (W/m2) under an overcast sky
-    Provided or calculated here:
+    Optionally provided:
+        lwup - upward longwave, will override calculated value
     Output:
         longwaveUp
            - longwave upward irradiance (W/m2) with given 
@@ -496,6 +541,12 @@ def calc_longwave_up(longwaveDown, solarDownGlobal,
         tsfcIterate(longwaveDownOvercast, solarDownGlobalOvercast,
                     T2m, wspd10m))
 
+    longwaveUpCalculated = longwaveUp
+
+    if lwup is not None:
+        # Override the calculated value with the provided swup.
+        longwaveUp = lwup
+
     if verbosity > 1:
         print("\n Longwave upward irradiances")
         print(" --------------------------------------------------")
@@ -504,11 +555,12 @@ def calc_longwave_up(longwaveDown, solarDownGlobal,
         print(" Surface longwave emissivity            : {:.2f}".format(emisSfc))
         print(" Surface solar albedo                   : {:.2f}".format(albedoSfc))
         print(" Surface temperature                    : {:.1f} K".format(Tsfc))
-        print(" Longwave upward irradiance             : {:.1f} W/m2".format(longwaveUp))
         print(" Surface temperature, clear             : {:.1f} K".format(TsfcClear))
-        print(" Longwave clear sky upward irradiance   : {:.1f} W/m2".format(longwaveUpClear))
+        print(" Longwave clear sky upward              : {:.1f} W/m2".format(longwaveUpClear))
         print(" Surface temperature, overcast          : {:.1f} K".format(TsfcOvercast))
-        print(" Longwave overcast upward irradiance    : {:.1f} W/m2".format(longwaveUpOvercast))
+        print(" Longwave overcast upward               : {:.1f} W/m2".format(longwaveUpOvercast))
+        print(" Longwave upward, calculated            : {:.1f} W/m2".format(longwaveUpCalculated))
+        print(" Longwave upward                        : {:.1f} W/m2".format(longwaveUp))
     
     return longwaveUp
 
@@ -553,9 +605,11 @@ def calc_Tmrt(latitude, longitude, dt,
     if solarZenith is None:
         (solarZenith, solarElevation, cosZenith, dayofyear,
          solarDownGlobal, solarDownDirect, solarDownDiffuse, solarUp,
-         longwaveDown, longwaveUp) = calc_irradiances(latitude, longitude, dt,
-                                                      T2m, e2m, wspd10m, pSfc, cloudFrac,
-                                                      verbosity)
+         longwaveDown, longwaveUp,
+         cloudFrac) = calc_irradiances(latitude, longitude, dt,
+                                       T2m, e2m, wspd10m, pSfc, cloudFrac,
+                                       swdn, swup, lwdn, lwup,
+                                       verbosity)
                                                                         
     # Fraction of total sphere taken up by sky/surface.
     fa = 0.5
@@ -637,6 +691,24 @@ def Td2Rh(T, Td):
     return RH
 
 
+def Rh2Td(T, Rh):
+    """
+    Given T in deg K and RH in %, calculate Td in deg K.
+    Use the August-Roche-Magnus formula, as given in Lawrence (2005):
+      http://journals.ametsoc.org/doi/pdf/10.1175/BAMS-86-2-225
+    Ken Waight / May 2026
+    """
+    A1 = 17.625
+    B1 = 243.04 # deg C
+    C1 = 610.94 # Pa
+    RhOver100 = Rh / 100.0
+    lnRhOver100 = math.log(Rh/100.0)
+    numerator = B1*(lnRhOver100 + (A1*T/(B1+T)))
+    denominator = A1 - lnRhOver100 - (A1*T/(B1+T))
+    Td = numerator / denominator
+    return Td
+
+
 def T2es(T):
     """
     Calculate the saturation vapor pressure es (Pa) from 
@@ -660,23 +732,26 @@ def TC2F(TC):
     return (1.8*TC) +32.
 
 
-def calcWbgt(yyyymmddhhmn, latitude, longitude,
-             T2mC, Td2mC, wspd10m, pSfc, cloudFrac, swdn,
+def calcWbgt(yyyymmddhhmn,
+             latitude, longitude,
+             T2mC, Td2mC, wspd10m, pSfc, cloudFrac,
+             swdn, swup, lwdn, lwup,
              verbosity):
     """ 
     Input variables needed:
-    yyyymmddhhmn (UTC)
+    yyyymmddhhmn - UTC time
     T2mC (C)
     Td2mC (C)
     wspd10m (m/s)
     pSfc (Pa)
-    cloudfrac or swdn - cloudfrac will be estimated if 
-                         short- and longwae radiation data is present
+    1. cloudfrac or 
+    2. swdn - cloudfrac will be estimated, or
+    3. swdn,swup,lwdn,lwup - cloudfrac will be estimated  
     Ken Waight / May 2025
     """
 
     # Prepare input variables.
-    dt = datetime.strptime(yyyymmddhhmn, '%Y%m%d%H%M')
+    dt = datetime.strptime(yyyymmddhhmn, '%Y%m%d%H%M')  # UTC.
     yyyy = int(yyyymmddhhmn[0:4])
     mm = int(yyyymmddhhmn[4:6])
     dd = int(yyyymmddhhmn[6:8])
@@ -693,22 +768,33 @@ def calcWbgt(yyyymmddhhmn, latitude, longitude,
     if verbosity > 1:
         print("\n Input data:")
         print(" --------------------------------------------------")
-        print(" Time and date         : {:02d}{:02d} UTC {:02d}/{:02d}/{:04d}".format(hh,mn,mm,dd,yyyy))
-        print(" Latitude              : {:.1f} deg".format(latitude))
-        print(" Longitude             : {:.1f} deg".format(longitude))
-        print(" Station pressure (mb) : {:.1f} mb".format(.01*pSfc))
-        print(" 2 m temperature (C)   : {:.1f} C".format(T2mC))
-        print(" 2 m dew point (C)     : {:.1f} C".format(Td2mC))
-        print(" 2 m rel. humidity (%) : {:.1f} %".format(100.0 * rh2m))
-        print(" 10 m wind speed (m/s) : {:.1f} m/s".format(wspd10m))
-        print(" cloud fraction        : {:.3f}".format(cloudFrac))
+        print(" Time and date     : {:02d}{:02d} UTC {:02d}/{:02d}/{:04d}".format(hh,mn,mm,dd,yyyy))
+        print(" Latitude          : {:.1f} deg".format(latitude))
+        print(" Longitude         : {:.1f} deg".format(longitude))
+        print(" Station pressure  : {:.1f} mb".format(.01*pSfc))
+        print(" 2 m temperature   : {:.1f} C".format(T2mC))
+        print(" 2 m dew point     : {:.1f} C".format(Td2mC))
+        print(" 2 m rel. humidity : {:.1f} %".format(100.0 * rh2m))
+        print(" 10 m wind speed   : {:.1f} m/s".format(wspd10m))
+        if cloudFrac is not None:
+            print(" cloud fraction        : {:.3f}".format(cloudFrac))
+        if swdn is not None:
+            print(" Downward shortwave: {:.1f} W/m2".format(swdn))
+        if swup is not None:
+            print(" Upward shortwave  : {:.1f} W/m2".format(swup))
+        if lwdn is not None:
+            print(" Downward longwave : {:.1f} W/m2".format(lwdn))
+        if lwup is not None:
+            print(" Upward longwave   : {:.1f} W/m2".format(lwup))
 
     # Calculate solar and longwave irradiances.
-    (solarZenith, solarElevation, cosZenith, dayofyear,
+    (solarZenith, solarElevation, cosZenith, dayofyear, 
      solarDownGlobal, solarDownDirect, solarDownDiffuse, solarUp,
-     longwaveDown, longwaveUp) = calc_irradiances(latitude, longitude, dt,
-                                                  T2m, e2m, wspd10m, pSfc, cloudFrac, swdn,
-                                                  verbosity)
+     longwaveDown, longwaveUp,
+     cloudFrac) = calc_irradiances(latitude, longitude, dt,
+                                   T2m, e2m, wspd10m, pSfc, cloudFrac,
+                                   swdn, swup, lwdn, lwup,
+                                   verbosity)
     
     # Calculate mean radiant temperature.
     Tmrt = calc_Tmrt(latitude, longitude, dt,
@@ -729,7 +815,7 @@ def calcWbgt(yyyymmddhhmn, latitude, longitude,
     TwetPrev = Td2m  # First guess.
     if verbosity > 1:
         print("First guess = dew point temperature: {:.1f} K = {:.1f} C = {:.1f} F".format(TwetPrev, TwetPrev-T0, TC2F(TwetPrev-T0)))
-    iterMax = 50
+    iterMax = 100
     converged = False
     iter = 0
     while not converged and iter < iterMax:  # Iterate until the difference becomes small.
@@ -744,7 +830,10 @@ def calcWbgt(yyyymmddhhmn, latitude, longitude,
             dEarthSun = 1.0 - 0.01672*math.cos(0.9856*dayofyear-4.0) 
             sMax = I0*cosZenith / (dEarthSun*dEarthSun) # Liljegren, eq. 14.
             sStar = solarDownGlobal / sMax
-            fDir = math.exp(3.0 - 1.34*sStar -1.65/sStar) # Liljegren, eq. 13.
+            if sStar > 0.0:
+                fDir = math.exp(3.0 - 1.34*sStar -1.65/sStar) # Liljegren, eq. 13.
+            else:
+                fDir = 0.0  # Night.
         else:
             fDir = 0.0  # Night.
         # From text above eq. 12, from Oke, p. 373, e2m in mb.
@@ -787,7 +876,7 @@ def calcWbgt(yyyymmddhhmn, latitude, longitude,
         Twet = (T2m - (LHV/CP)*(MW/MAIR)*((pr/sc)**A_NUSS)*((eWick-e2m)/(pSfc-eWick)) + 
                 deltaFnetOverA/h)
         if verbosity > 1:
-            print('  ',TwetPrev, '->', Twet)
+            print('  ','iter:', iter, TwetPrev, '->', Twet, 'difference:', Twet-TwetPrev)
         if abs(Twet-TwetPrev) <= 0.02:  # Iterate until the difference becomes small.
             converged = True
         TwetPrev = 0.9*TwetPrev + 0.1*Twet  # Value for next iteration.
@@ -827,6 +916,7 @@ def calcWbgt(yyyymmddhhmn, latitude, longitude,
                    (1.0+(1.0/(2.0*cosZenith)-1.0)*fDir+ALBEDO_SFC))
         Tglobe = Tglobe4 ** 0.25
         if verbosity > 1:
+            print('  ','iter:', iter, TglobePrev, '->', Tglobe, 'difference:', Tglobe-TglobePrev)
             print('   ', TglobePrev, '->', Tglobe)
         if abs(Tglobe-TglobePrev) <= 0.02:  # Iterate until the difference becomes small.
             converged = True
@@ -851,4 +941,4 @@ def calcWbgt(yyyymmddhhmn, latitude, longitude,
         print(" 2 m WBGT                 : {:5.1f} C = {:5.1f} F".format(wbgt-T0, TC2F(wbgt-T0)))
     
     # Return results.
-    return (Twet-T0, Tglobe-T0, wbgt-T0)
+    return (Twet-T0, Tglobe-T0, wbgt-T0, cloudFrac)

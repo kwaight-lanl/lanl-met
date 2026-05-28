@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 
 """
-tower2wbgt.py
+gis2wbgt.py
 Read a 15-min csv file which contains all tower sites, calculate the wet bulb globe
   temperature for each time, write a simple csv file.
   The input file is the most recent 24 hours of data in the WMDC GIS24 report.
-Usage: python tower2wbgt.py [-v] [-o csvfile] metfile  
-  metfile is the met file to read. It is assumed to be in the format downloaded from the Weather Machine.
+Usage: python gis2wbgt.py [-v] [-o csvfile] metfile  
+  metfile is the met file to read. It is assumed to be a GIS24 report file.
 Ken Waight / May 2026
 """
 
@@ -94,6 +94,9 @@ columnName['press'] = 'PRES  (MB)'
 # Wind speed power law exponents for each stability class (from EPA guidance).
 powerLawExponentRural = {'A': 0.07, 'B': 0.07, 'C': 0.10, 'D': 0.15, 'E': 0.35, 'F': 0.55}
 
+# Towers to process. Some towers do not have all of the necessary variables.
+towers = ['TA6', 'TA54']
+
 # =======
 # Banner.
 # =======
@@ -116,16 +119,22 @@ variables.append('Temp0')
 for var in variables:
     obsIn[var] = []
     obsOut[var] = []
+csvOut = {}
 
 # --------------------------------------------------------------------
-# Read LANL 15-minute data at one tower location.
+# Read 15-minute data at one tower location.
 #   Save each of the requested variables.
 # --------------------------------------------------------------------
-csvOut = open(csvFile, 'w')
-csvOut.write('dts,WBGT(C),T2m(C),Td2m,wspd10m(m/s),pSfc(mb),cloudFrac,' +
-             'swdn,swup,lwdn,lwup,Twet,Tglobe,' +
-             'T2m(F),wspd10m(mph),RH,pSfc(in Hg),WBGT(F)\n')
-print("\nReading LANL file:", metFile)
+index = csvFile.find('.csv')
+for tower in towers:
+    print('tower:', tower, tower.lower())
+    csvFileTower = csvFile[:index] + '.' + tower.lower() + csvFile[index:]
+    csvOut[tower] = open(csvFileTower, 'w')
+    csvOut[tower].write('dts,WBGT(C),T2m(C),Td2m,wspd10m(m/s),pSfc(mb),cloudFrac,' +
+                        'swdn,swup,lwdn,lwup,Twet,Tglobe,' +
+                        'T2m(F),wspd10m(mph),RH,pSfc(in Hg),WBGT(F)\n')
+    print("\nReading data file:", metFile)
+    
 dtFirst = None
 dtLast = None
 dtList = []
@@ -140,10 +149,13 @@ with open(metFile, 'r') as infile:
             tower = row[columnStation]
             row[columnDateTime1]
             columnDateTime = columnDateTime1
-            print('columnDateTime 1:', columnDateTime)
+            #print('columnDateTime 1:', columnDateTime)
         except KeyError:
             columnDateTime = columnDateTime2
-            print('columnDateTime 2:', columnDateTime)
+            #print('columnDateTime 2:', columnDateTime)
+        if tower not in towers:
+            continue
+        print('\nTower:', tower)
         if (row[columnDateTime] and
             (re.search(r'^\d+-\d+-\d+ \d+:\d+:\d+', row[columnDateTime]) or
              re.search(r'^\d+-\d+-\d+ \d+:\d+', row[columnDateTime]))):
@@ -151,16 +163,17 @@ with open(metFile, 'r') as infile:
             try:
                 # Try an older formatted date.
                 dt = datetime.strptime(row[columnDateTime], "%Y-%m-%d %H:%M:%S")
-                print('dt 1:', dt)
+                #print('dt 1:', dt)
             except:
                 try:
                     # Try a datalogger-formatted date.
                     dt = datetime.strptime(row[columnDateTime], "%m/%d/%Y %H:%M")
-                    print('dt 2:', dt)
+                    #print('dt 2:', dt)
                 except:
                     # Try a new Weather Machine-formatted date.
                     dt = datetime.strptime(row[columnDateTime], "%Y-%m-%d %H:%M")
-                    print('dt 3:', dt)
+                    #print('dt 3:', dt)
+            print('dt:', dt)
             # Save first time.
             # ----------------------------------------------------------
             # Save needed variables, set to None for missing data.
@@ -181,12 +194,12 @@ with open(metFile, 'r') as infile:
             except KeyError:
                 try:
                     rh = float(row['RH'])
-                    print('rh:', rh) #ktw
-                    print('T2mC:', T2mC) #ktw
+                    #print('rh:', rh) #ktw
+                    #print('T2mC:', T2mC) #ktw
                     Td2mC = wbgt.Rh2Td(T2mC, rh)
-                    print('Td2mC:', Td2mC) #ktw
+                    #print('Td2mC:', Td2mC) #ktw
                 except:
-                    print('Td calc failed?') #ktw
+                    #print('Td calc failed?') #ktw
                     sys.exit()
                     Td2mC = None
             try:
@@ -194,7 +207,7 @@ with open(metFile, 'r') as infile:
             except ValueError:
                 wspd10m = None
             try:
-                pSfc = 100.0 * float(row['PRESS  (MBAR)'])
+                pSfc = 100.0 * float(row['Press  (MBAR)'])
             except KeyError:
                 pSfc = None
             try:
@@ -233,6 +246,7 @@ with open(metFile, 'r') as infile:
                 pSfc is not None):
                 try:
                     # Calculate WBGT for one time.
+                    print('calcWbgt')
                     (Twet, Tglobe, wbgt1, cloudFrac) = wbgt.calcWbgt(yyyymmddhhmnUtc,
                                                                      latitude, longitude,
                                                                      T2mC, Td2mC, wspd10m, pSfc, cloudFrac,
@@ -256,7 +270,7 @@ with open(metFile, 'r') as infile:
                         T2mF,wspd10mMph,
                         rh,pSfcInHg,
                         wbgtF)
-                    csvOut.write(line)
+                    csvOut[tower].write(line)
                 except:
                     print('ERROR')
                     continue
@@ -286,7 +300,6 @@ dtOut = dtIn
 for var in variables:
     obsOut[var] = obsIn[var]
 
-
 # -----------------------------------------
 # Print a simple list of the data.
 # Not sure the printed list is worth keeping. 
@@ -296,6 +309,7 @@ for var in variables:
 # Also write the output to a CSV file.
 # ------------------------------------
 print('\nWriting to CSV file:', csvFile)
+sys.exit()
 with open(csvFile, 'w') as csvOut:
     csvOut.write(','.join(header.split()) + '\n')
     for i, dateTime in enumerate(dtOut):
