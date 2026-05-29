@@ -13,6 +13,18 @@ from datetime import datetime, timedelta
 import pandas as pd
 import matplotlib.pyplot as plt
 #import seaborn as sns
+import argparse
+
+# ----------------------------------------------------------------
+# Parse arguments.
+# Get name of tower2wbgt.csv file to read. 
+# ----------------------------------------------------------------
+parser = argparse.ArgumentParser(description="Read a tower2wbgt.csv file and make a simple plot")
+parser.add_argument("tower2wbgtFile", help="Name of tower2wbgt.csv file to read")
+parser.add_argument("-v", "--verbosity", help="Increase the verbosity of the output",
+                    action="count")
+args = parser.parse_args()
+tower2wbgtFile = args.tower2wbgtFile
 
 # Initialize.
 wbgtData = {}
@@ -22,16 +34,13 @@ wbgtData = {}
 fig = plt.figure()
 ax1 = fig.add_subplot(1, 1, 1)
 ax1.set_title('Wet Bulb Globe Temperature')
-ax1.set_xticks([0, 3, 6, 9, 12, 15, 18, 21, 24])
+#ax1.set_xticks([0, 3, 6, 9, 12, 15, 18, 21, 24])
 ax1.set_xlabel('Hour of the Day (MST)')
 ax1.set_ylabel('WBGT (F)')
 
-tower = 'ta6'
 
-# Get the filename.
-fileName = 'tower2wbgt.' + tower + '.csv'
 # Read data into a dataframe.
-wbgtData1 = pd.read_csv(fileName, parse_dates=True)
+wbgtData1 = pd.read_csv(tower2wbgtFile, parse_dates=True)
 #print(wbgtData1)
 # Create an html table from a subset of the data frame.
 wbgtData1Html = wbgtData1[['dts','wspd10m(mph)','RH','T2m(F)','WBGT(F)']]
@@ -40,27 +49,33 @@ htmlOut = open(htmlFile, 'w')
 # Write the html file.
 htmlOut.write(wbgtData1Html.to_html())
 
-wbgtData['ta6'] = wbgtData1
+wbgtData[0] = wbgtData1
 
 # Create a dataframe with all of the variables in the csv file.
-df = pd.DataFrame(wbgtData['ta6']['dts'])
+df = pd.DataFrame(wbgtData[0]['dts'])
 print('df:', df)
 print('df.dts:', df.dts)
-df['wbgt'] = wbgtData['ta6']['WBGT(F)']
+df['wbgt'] = wbgtData[0]['WBGT(F)']
 #print(df)
 # Create a time series from the datetime and WBGT columns.
-wbgts = wbgtData['ta6']['WBGT(F)'].values
-dates = wbgtData['ta6']['dts'].values
+wbgts = wbgtData[0]['WBGT(F)'].values
+dates = wbgtData[0]['dts'].values
 print('dates:', dates)
 hours = []
 day1 = None
+lastHour = -1.0
 for date in dates:
     #hour = date[11:]
     dt1 = datetime.strptime(date, "%m/%d/%Y %H:%M")
     if not day1:
         day1 = dt1.strftime("%b %d %Y")
-    hour = dt1.hour + (dt1.minute/60.0)
+    nextHour = dt1.hour + (dt1.minute/60.0)
+    if nextHour < lastHour:
+        hour = nextHour + 24.0
+    else:
+        hour = nextHour
     hours.append(hour)
+    lastHour = hour
 print('hours:', hours)
 tsAll = pd.Series(wbgts, index=hours)
 #print('wbgts:', wbgts)

@@ -880,8 +880,15 @@ def calcWbgt(yyyymmddhhmn,
         if abs(Twet-TwetPrev) <= 0.02:  # Iterate until the difference becomes small.
             converged = True
         TwetPrev = 0.9*TwetPrev + 0.1*Twet  # Value for next iteration.
+    # Revert to simple estimation if the result of the iteration is too far off.
+    diffWetDew = Twet - Td2m
+    if abs((Twet > T2m) or
+           abs(diffWetDew) >= 30.0):
+        Twet = (2.0/3.0)*T2m + (1.0/3.0)*Td2m
         if verbosity > 1:
-            print("Final wet bulb temperature: {:.1f} K = {:.1f} C = {:.1f} F".format(Twet, Twet-T0, TC2F(Twet-T0)))
+            print('WARNING: Bad iteration, reverted to simple approximation')
+    if verbosity > 1:
+        print("Final wet bulb temperature: {:.1f} K = {:.1f} C = {:.1f} F".format(Twet, Twet-T0, TC2F(Twet-T0)))
     if not converged:
         print('Iteration to wet bulb temperature failed!')
         sys.exit()
@@ -917,7 +924,6 @@ def calcWbgt(yyyymmddhhmn,
         Tglobe = Tglobe4 ** 0.25
         if verbosity > 1:
             print('  ','iter:', iter, TglobePrev, '->', Tglobe, 'difference:', Tglobe-TglobePrev)
-            print('   ', TglobePrev, '->', Tglobe)
         if abs(Tglobe-TglobePrev) <= 0.02:  # Iterate until the difference becomes small.
             converged = True
         TglobePrev = 0.9*TglobePrev + 0.1*Tglobe  # Go to next iteration.
