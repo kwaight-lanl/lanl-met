@@ -3,7 +3,7 @@ plotWbgt.py
 Read Wet Bulb Globe Temperature time series file and make a basic WBGT time series.
   Also write a simle HTML table.
 Adapted from plotTs.py.
-Ken Waight / June 2025
+Ken Waight / June 2026
 """
 
 import os
@@ -29,11 +29,15 @@ tower2wbgtFile = args.tower2wbgtFile
 # Initialize.
 wbgtData = {}
 
+# Parse tower2wbgt.location.csv filename for location name.
+filenameParts = tower2wbgtFile.split('.')
+location = filenameParts[1].upper()
+
 # Set up plots.
 #plt.style.use('seaborn')
 fig = plt.figure()
 ax1 = fig.add_subplot(1, 1, 1)
-ax1.set_title('Wet Bulb Globe Temperature')
+ax1.set_title('Wet Bulb Globe Temperature' + ', ' + location.upper())
 #ax1.set_xticks([0, 3, 6, 9, 12, 15, 18, 21, 24])
 ax1.set_xlabel('Hour of the Day (MST)')
 ax1.set_ylabel('WBGT (F)')
@@ -44,7 +48,7 @@ wbgtData1 = pd.read_csv(tower2wbgtFile, parse_dates=True)
 #print(wbgtData1)
 # Create an html table from a subset of the data frame.
 wbgtData1Html = wbgtData1[['dts','wspd10m(mph)','RH','T2m(F)','WBGT(F)']]
-htmlFile = 'wbgt.html'
+htmlFile = 'wbgt.' + location.upper() + '.html'
 htmlOut = open(htmlFile, 'w')
 # Write the html file.
 htmlOut.write(wbgtData1Html.to_html())
@@ -91,4 +95,5 @@ ax1.plot(tsAll.index, tsAll.values, color='black', linestyle='solid', label=days
 ax1.legend(loc='best')
 
 # Save as a file.
-fig.savefig('wbgt.png')
+wbgtFile = 'wbgt.' + location.upper() + '.png'
+fig.savefig(wbgtFile)
