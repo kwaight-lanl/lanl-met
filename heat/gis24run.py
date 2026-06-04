@@ -10,7 +10,7 @@ import sys
 import subprocess
 
 # List of locations to run.
-locations = ['TA6', 'TA54']
+locations = ['ta6', 'ta54']
 
 # ----------------------------------------------------------------
 # Read latest GIS24 report file. Calculate WBGT and write output
@@ -30,3 +30,22 @@ for location in locations:
     command = ['python3', './plotWbgt.py', tower2wbgtFile]
     print('   ', location)
     subprocess.run(command)
+
+# ----------------------------------------------------------------
+# Copy plots and html tables to the S3 bucket.
+# ----------------------------------------------------------------
+print('\Copy plots and html tables to S3 bucket:')
+for location in locations:
+    plotFile = 'wbgt' + '.' + location.upper() + '.png'
+    htmlFile = 'wbgt' + '.' + location.upper() + '.html'
+    #aws s3 cp wbgt.TA54.png s3://weather.lanl.gov/visualization_assets/wbgt.TA54.png
+    print('   ', location)
+    command = ['aws', 's3', 'cp', plotFile, 
+               's3://weather.lanl.gov/visualization_assets/' + plotFile]
+    #print('command:', ' '.join(command))
+    subprocess.run(command)
+    command = ['aws', 's3', 'cp', htmlFile, 
+               's3://weather.lanl.gov/visualization_assets/' + htmlFile]
+    subprocess.run(command)
+
+
