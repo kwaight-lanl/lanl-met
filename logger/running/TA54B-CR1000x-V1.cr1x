@@ -1,0 +1,479 @@
+' Built with assemble.py: 2026-05-08 10:20
+' assemble.py -tables dat1min dat15min dat24hr opsMonitor -parts battery cr1000x wind-horiz-1 wind-vert-1 temp-rh-41382-0 temp-rh-41382-1 fm10hr TA54B -o TA54B-2.cr1x
+'
+'June 22, 2026 updated Program Title to Reflect Standardization Scheme for all 
+'datalogger program titles for our EPC-CP Met Program.
+'Example Format: (Site Deploed-Logger Model/Type-Code Release Version-CRBasic Code for logger type).
+'
+'New Program Title:  TA54B-CR1000x-V1.cr1x
+'
+' =============================
+' Wiring information, comments.
+' =============================
+
+'May-8th, 2026, R0
+'
+'Wiring Configuration for wiring and coding for the 10-Meter Towers and Datalogger Transition to CR1000x(e) Models.
+'Battery Bank Charging (OpsMonitoring) 
+'Note:  A 10:1 Voltage Divider Module is required for proper PV Voltage Scaling
+'
+'PV Voltage Measurement Scaling
+'SE1		+PV Panel Voltage (Hi) 		White 
+'SE2		-PV Panel Voltage Return (Lo) 	Black
+'Clear		Cable Shield				Clear
+'
+'L-0  41382VC Instrument Wiring
+'SE5		Temp Signal		yellow
+'SE6		RH Signal		Blue
+'Gnd		Gnd			Brown
+'SW1		+12V Power		Orange
+'
+'L-0 Fan Motor RPM Signal
+' C1		Tach Signal		White
+'+12V		 (+) Power 		Red
+'Gnd		 (-) Power Rtn/Gnd	Black
+'
+'L-1  41382VC Instrument Wiring
+'SE3		Temp Signal		Brown
+'SE4		RH signal		Green
+'Gnd		Gnd			Black
+'+12V		+12V Power		Red
+'
+'L-1 Fan Motor Signal/RPM
+'C2		Tach Signal		White
+'+12V		(+) Power		Red
+'Gnd		(-) Power Rtn/Gnd	Brown
+'
+'Fuel Moisture Station
+'107L Temp Sensor
+'VX1		Power to 107L 		Black
+'SE9		Fuel Moisture Temp. Signal 	Red
+'Gnd		Signal Returns 		Violet, Clear/Shield
+'-----------------------------------------
+'C506L Fuel Moisture Module
+'SE10		Signal 			Green
+'C5		Enable			Orange
+'+12V		Power			Red
+'Gnd		Gnd/Signal/Rtn	Black, Clear
+'
+'
+'
+'-------------------------------------------------------------------
+'Horizontal Wind (05305AQ) 
+'Note:  For Horiz. Wind Speed Signal Outputs from an analog instrument
+'the instrument Must be wired to a Pulse (P) Channel for the CR1000X datalogger. 
+'If you need to measure more than 2 05305AQ instruments you can use a LLAC4 module from CSI for converting 
+'the instrument output signal to an acceptable format for the  (C) Channel inputs to measure the speed.
+'----------------------------------------------------------------------------------
+'
+'
+'SE11		WDir Signal		Yellow
+'P1		WSpd Signal		Red
+'VX2		WDir Excite		Blue
+'Gnd		WDir Ref.		Black
+'Gnd		WSpd Ref		Green
+'Gnd		Earth Gnd		White	
+'
+'Vertical Wind (27106T)
+'SE7		Signal Input		Red
+'Gnd		Signal Ref./Rtn	Black
+'
+'
+'
+'TA54B-10-Meter Tower CR1000xe Datalogger Signal Cable Wiring
+'
+'TA54B_10-Meter-Tower-CR1000xe-Signal-CableWiring_May-08-2026_R0.docx
+'Page 1 of 2
+
+
+' ==================================
+' List of equipment and instruments.
+' ==================================
+' Battery bank, PV charging hardware
+' Campbell Scientific CR1000X datalogger
+' RM Young 05305-AQ Horizontal Wind Speed & Direction Sensor (Level 1)
+' RM Young 27106T Vertical Wind Speed Sensor (Level 1)
+' RM Young 41382VC Air Temp and RH (Level 0)
+' RM Young 41382VC Air Temp and RH (Level 1)
+' Campbell Scientific Fuel Moisture Station Package (CS506 & 107L)
+
+
+' ====================
+' Definitions.
+' ====================
+' Data logger channel assignments and declared variables.
+
+' Battery.
+Const d_pvvolts = 1 'PhotoVoltaic Panel Charging Voltage
+
+' RM Young 05305-AQ Horizontal Wind Speed & Direction Sensor
+Const p_wind_horiz_lev1 = P1 'Horiz WindSpeed P1 Channel
+Const se_wind_horiz_lev1 = 11 'Horiz WindDirection SE11 Channel
+Const ex_wind_horiz_lev1 = VX2 'WindDirection Excite VX2 Terminal
+
+' RM Young 27106T Vertical Wind Speed Sensor
+Const se_wind_vert_lev1 = 7 ' Vert WindSpeed SE7 Channel
+
+' RM Young 41382VC Temp/RH Sensor w/Aspiration Fans (Level 0)
+Const se_temp_41382_lev0 = 5 ' Air Temp Signal SE5 Channel
+Const se_rh_41382_lev0 = 6 ' RH Signal SE6 Channel
+Const p_fan_lev0 = C1 ' Asp. Fan RPM Signal C1 Control Port
+
+' RM Young 41382VC Temp/RH Sensor w/Aspiration Fans (Level 1)
+Const se_temp_41382_lev1 = 3 ' Air Temp Signal SE3 Channel
+Const se_rh_41382_lev1 = 4 ' RH Signal SE4 Channel
+Const p_fan_lev1 = C2 ' Asp. Fan RPM Signal C2 Control Port
+
+' Campbell Scientific Fuel Moisture Station Package (CS506 & 107L)
+Const c_fm10hr_portset = C5 ' CS506 Module Enable Power For Cntrl Port C5
+Const se_fm10hr_moisture = 10 ' CS506 Fuel Moist. Calc. Signal SE10 Channel
+Const se_fm10hr_temp = 9 ' 107L Therm-Temp Signal SE9 Channel
+
+
+' ====================
+' Declare Variables.
+' ====================
+Const PScan=3  'enter program execution interval in seconds
+' Variables used by multiple instruments.
+Public hh, mm
+Units hh = hours
+Units mm = minutes
+
+' Battery
+Public BattV, PTemp_C
+Public PVVolts
+Units BattV=V
+Units PTemp_C=deg C
+Units PVVolts=V
+
+' RM Young 05305-AQ Horizontal Wind Speed & Direction Sensor (Level 1)
+Public spd1, dir1
+Public mxgst1, dirgst1
+Public HW1Max24HrTime(9) 
+Public mx1gst, dir1gst
+Public HWTime1_1min(9)
+Public mxgsttoday
+Public tgst1 As String * 4
+Public t1gst As String * 4
+Units spd1=m/s
+Units mxgst1=m/s
+Units mx1gst=m/s
+Units dirgst1=deg
+Units dir1gst=deg
+Units dir1=deg
+Units mxgsttoday = m/s
+Units tgst1 = 24-hr-time
+Units t1gst = 24-hr-time
+
+' RM Young 27106T Vertical Wind Speed Sensor (Level 1)
+Public w1
+Units w1=m/s
+
+' RM Young 41382VC Air Temp and RH (Level 0)
+Public temp0
+Public rh0
+Public dewp0
+Public mntemptoday = 99.0
+Public mxtemptoday = -99.0
+Public MinTime(9)
+Public MaxTime(9)
+Public tmntemp As String * 4
+Public tmxtemp As String * 4
+Public fan0
+Units temp0=deg C
+Units rh0=%
+Units dewp0=deg C
+Units mntemptoday=deg C
+Units mxtemptoday=deg C
+Units tmntemp=24-hr-time
+Units tmxtemp=24-hr-time
+Units fan0=Hz
+
+' RM Young 41382VC Air Temp and RH (Level 1)
+Public temp1
+Public rh1
+Public dewp1
+Public fan1 
+Units temp1=deg C
+Units rh1=%
+Units dewp1=deg C
+Units fan1=Hz
+
+' Campbell Scientific Fuel Moisture Station Package (CS506 & 107L)
+Public FuelM10Hr_uS
+Public fm10hr
+Public tempFuel
+Units FuelM10Hr_uS=microSec
+Units fm10hr=%
+Units tempFuel=deg C
+
+' ====================
+' Data Tables.
+' ====================
+
+DataTable(Dat1min,True,48)  '*Note: data table size fixed to 48 records
+  DataInterval(0,1,Min,10)
+  ' This table is used to compute speed, direction and time of max sustained
+  '    1min gust.
+
+  ' RM Young 05305-AQ Horizontal Wind Speed & Direction Sensor (Level 1)
+  WindVector (1,spd1,dir1,FP2,False,0,0,1)  
+  FieldNames("spd1min,dir1min")
+EndTable
+
+DataTable(Dat15min,True,-1)
+  DataInterval(0,15,Min,10)
+
+  ' RM Young 05305-AQ Horizontal Wind Speed & Direction Sensor (Level 1)
+  WindVector (1,spd1,dir1,FP2,False,0,0,1)  
+  FieldNames("spd1,dir1")
+  StdDev (1,spd1,FP2,False)
+  FieldNames("sdspd1")
+  StdDev (1,dir1,FP2,False)
+  FieldNames("sddir1")
+  Sample(1, mxgsttoday, FP2)
+
+  ' RM Young 27106T Vertical Wind Speed Sensor (Level 1)
+  Average(1,w1,FP2,False)  
+  FieldNames("w1")
+  StdDev(1,w1,FP2,False)  
+  FieldNames("sdw1")
+
+  ' RM Young 41382VC Air Temp and RH (Level 0)
+  Average(1,temp0,FP2,False)
+  FieldNames("temp0")
+  Average(1,rh0,FP2,False)
+  FieldNames("rh0")
+  Average(1,dewp0,FP2,False)  
+  FieldNames("dewp0")
+  Sample(1, mntemptoday, FP2)
+  Sample(1, mxtemptoday, FP2)
+
+  ' RM Young 41382VC Air Temp and RH (Level 1)
+  Average(1,temp1,FP2,False)
+  FieldNames("temp1")
+  Average(1,rh1,FP2,False)
+  Fieldnames("rh1")
+  Average(1,dewp1,FP2,False)  
+  FieldNames("dewp1")
+
+  ' Campbell Scientific Fuel Moisture Station Package (CS506 & 107L)
+  Average (1,fm10hr,FP2,False)
+  FieldNames("fm10hr")
+  Average (1,tempFuel,FP2,False)
+  FieldNames("tempFuel")
+EndTable
+
+DataTable(Dat24Hr,True,-1)
+  DataInterval(0,24,Hr,10)
+
+  ' RM Young 05305-AQ Horizontal Wind Speed & Direction Sensor (Level 1)
+  Average(1,spd1,FP2,False)  
+  Fieldnames("avgspd1")
+  Sample (1,mxgst1,FP2)  
+  Sample (1,dirgst1,FP2)  
+  Sample(1,tgst1,String)
+  Sample (1,mx1gst,FP2)  
+  Sample (1,dir1gst,FP2)  
+  Sample(1,t1gst,String)
+
+  ' RM Young 41382VC Air Temp and RH (Level 0)
+  Average(1,temp0,FP2,False)  
+  Fieldnames("avgtemp0")
+  Maximum(1,temp0,FP2,False,False) 
+  FieldNames("mxtemp0")
+  Sample(1, tmxtemp, String)
+  Minimum(1,temp0,FP2,False,False) 
+  FieldNames("mntemp0")
+  Sample(1, tmntemp, String)
+  Average (1,rh0,FP2,False)
+  Fieldnames("avgrh0")
+  Maximum(1,rh0,FP2,False,False)  
+  Fieldnames("mxrh0")
+  Minimum(1,rh0,FP2,False,False)  
+  Fieldnames("mnrh0")
+  Average(1,dewp0,FP2,False)  
+  Fieldnames("avgdewp0")
+  Maximum(1,dewp0,FP2,False,False)  
+  Fieldnames("mxdewp0")
+  Minimum(1,dewp0,FP2,False,False)  
+  Fieldnames("mndewp0")
+EndTable
+
+DataTable(OpsMonitor,True,-1)
+  DataInterval(0,15,Min,0)
+
+  ' Battery
+  Average(1,BattV,FP2,False)
+  Average(1,PTemp_C,FP2,False)
+  FieldNames("PTemp_AVGDegC")
+  Average(1,PVVolts,FP2,False)
+
+  ' RM Young 41382VC Air Temp and RH (Level 0)
+  Average (1,fan0,FP2,False) 
+
+  ' RM Young 41382VC Air Temp and RH (Level 1)
+  Average (1,fan1,FP2,False) 
+EndTable
+
+' ====================
+' Subroutines.
+' ====================
+
+' ====================
+' Main Program.        
+' ====================
+BeginProg
+
+' ====================
+' Main Loop.        
+' ====================
+  Scan(3,Sec,1,0)
+
+    ' Battery
+    ' Datalogger Battery Voltage measurement 'BattV'
+    Battery(BattV)
+    ' Datalogger Wiring Panel Temperature measurement 'PTemp_C'
+    PanelTemp(PTemp_C,_60Hz)
+    ' Monitor exactly how high the sun voltage is being provided by the Solar Panels throughout the day.
+    VoltDiff(PVVolts,1,mV5000,d_pvvolts,True,500,60,0.01,0)
+
+    ' RM Young 05305-AQ Wind Speed & Direction Sensor (Level 1)
+    ' Measure instantaneous wind speed and direction.
+    PulseCount(spd1,1,p_wind_horiz_lev1,5,1,0.1024,0)
+    BrHalf(dir1,1,mV1000,se_wind_horiz_lev1,ex_wind_horiz_lev1,1,1000,True,0,_60Hz,355,0)
+    If dir1>=360 OR dir1<0 Then dir1=0
+
+    ' Keep track of the speed, direction and time of the maximium 3 sec gust.
+    If spd1 > mxgst1 Then
+      mxgst1 = spd1
+      dirgst1 = dir1
+      mxgsttoday = mxgst1
+      RealTime (HW1Max24HrTime())
+      hh = HW1Max24HrTime(4)
+      mm = HW1Max24HrTime(5)
+      'Sprintf(tgst1, "%02d%02d",INT(hh),INT(mm))
+      If hh >= 10 AND mm >= 10 Then
+        tgst1 = "" + hh + mm
+      ElseIf hh >= 10 AND mm < 10 Then
+        tgst1 = "" + hh + "0" + mm
+      ElseIf hh < 10 AND mm >= 10 Then
+        tgst1 = "0" + hh + mm
+      ElseIf hh < 10 AND mm < 10 Then
+        tgst1 = "0" + hh + "0" + mm
+      EndIf
+    EndIf
+
+    ' Keep track of the speed, direction and time of the maximium 1 min gust.
+    If Dat1min.spd1min > mx1gst Then
+      mx1gst = Dat1min.spd1min
+      dir1gst = Dat1min.dir1min
+      RealTime (HWTime1_1min())
+      hh = HWTime1_1min(4)
+      mm = HWTime1_1min(5)
+      'Sprintf(t1gst, "%02d%02d",INT(hh),INT(mm))
+      If hh >= 10 AND mm >= 10 Then
+        t1gst = "" + hh + mm
+      ElseIf hh >= 10 AND mm < 10 Then
+        t1gst = "" + hh + "0" + mm
+      ElseIf hh < 10 AND mm >= 10 Then
+        t1gst = "0" + hh + mm
+      ElseIf hh < 10 AND mm < 10 Then
+        t1gst = "0" + hh + "0" + mm
+      EndIf
+    EndIf
+
+    '  RM Young 27106T Wind Speed Sensor (Level 1)
+    '  Wind Speed Sensor measurements 'w1'
+    VoltSe(w1,1,mV5000,se_wind_vert_lev1,True,0,_60Hz,0.0225,0)
+
+    ' RM Young 41382VC Air Temp and RH (Level 0)
+    VoltSe (temp0,1,mV1000,se_temp_41382_lev0,1,0,60,.1,-50)
+    VoltSe (rh0,1,mV1000,se_rh_41382_lev0,1,0,60,.1,0)
+    DewPoint(dewp0,temp0,rh0)
+    If dewp0>temp0 OR dewp0=NAN Then dewp0=temp0
+    ' Measure the fan speed in Hz
+    PulseCount (fan0,1,p_fan_lev0,3,1,1.0,0)
+    
+    ' Keep track of daily min/max.
+    If temp0 < mntemptoday Then
+      mntemptoday = temp0
+      RealTime (MinTime())
+      hh = MinTime(4)
+      mm = MinTime(5)
+      'Sprintf(tmntemp, "%02d%02d",hh,mm)
+      If hh >= 10 AND mm >= 10 Then
+        tmntemp = "" + hh + mm
+      ElseIf hh >= 10 AND mm < 10 Then
+        tmntemp = "" + hh + "0" + mm
+      ElseIf hh < 10 AND mm >= 10 Then
+        tmntemp = "0" + hh + mm
+      ElseIf hh < 10 AND mm < 10 Then
+        tmntemp = "0" + hh + "0" + mm
+      EndIf
+    EndIf
+    If temp0 > mxtemptoday Then
+      mxtemptoday = temp0
+      RealTime (MaxTime())
+      hh = MaxTime(4)
+      mm = MaxTime(5)
+      'Sprintf(tmxtemp, "%02d%02d",INT(hh),INT(mm))
+      If hh >= 10 AND mm >= 10 Then
+        tmxtemp = "" + hh + mm
+      ElseIf hh >= 10 AND mm < 10 Then
+        tmxtemp = "" + hh + "0" + mm
+      ElseIf hh < 10 AND mm >= 10 Then
+        tmxtemp = "0" + hh + mm
+      ElseIf hh < 10 AND mm < 10 Then
+        tmxtemp = "0" + hh + "0" + mm
+      EndIf
+    EndIf
+
+    ' RM Young 41382VC Air Temp and RH (Level 1)
+    VoltSe (temp1,1,mV1000,se_temp_41382_lev1,1,0,60,.1,-50)
+    VoltSe (rh1,1,mV1000,se_rh_41382_lev1,1,0,60,.1,0)
+    DewPoint(dewp1,temp1,rh1)
+    If dewp1>temp1 OR dewp1=NAN Then dewp1=temp1
+    ' Measure the fan speed in Hz
+    PulseCount (fan1,1,p_fan_lev1,3,1,1.0,0)
+
+    ' Campbell Scientific Fuel Moisture Station Package (CS506 & 107L)
+    ' CS506 Fuel Moisture Sensor (constant power) measurements
+    PortSet(c_fm10hr_portset,1) ' Power on the fuel moisture sensor
+    PeriodAvg(FuelM10Hr_uS,1,0,se_fm10hr_moisture,0,0,100,10,1,0)
+    PortSet(c_fm10hr_portset,0) ' Power off the fuel moisture sensor
+    If FuelM10Hr_uS <= 17.7 Then
+      fm10hr=7.6298*FuelM10Hr_uS-130.0904
+    Else
+      fm10hr=0.0406*FuelM10Hr_uS^2+3.7685*FuelM10Hr_uS-73.7974
+    EndIf
+    ' CS506 Fuel Temperature Sensor measurement
+    Therm107 (tempFuel,1,se_fm10hr_temp,Vx1,0,_60Hz,1,0)
+
+' =================
+' Table calls
+' =================
+
+    CallTable dat1min
+    CallTable dat15min
+    CallTable dat24hr
+    CallTable opsMonitor
+
+    If TimeIntoInterval (0,1,Day) Then
+      ' Max 3 sec gusts.
+      mxgst1 = 0
+      dirgst1 = 0
+      mxgsttoday = 0
+
+      ' Max 1 min gusts.
+      mx1gst = 0
+      dir1gst = 0
+    EndIf
+    If TimeIntoInterval (0,1,Day) Then
+      ' Reset variables at the beginning of a new day. 
+      mntemptoday = 99
+      mxtemptoday = -99
+    EndIf
+  NextScan
+
+EndProg

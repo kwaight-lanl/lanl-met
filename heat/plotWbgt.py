@@ -1,6 +1,6 @@
 """
 plotWbgt.py
-Read Wet Bulb Globe Temperature time series file and make a basic WBGT time series.
+Read a Wet Bulb Globe Temperature time series file and make a basic WBGT time series plot.
   Also write a simle HTML table.
 Adapted from plotTs.py.
 Ken Waight / June 2026
@@ -38,7 +38,7 @@ location = filenameParts[1].upper()
 fig = plt.figure()
 ax1 = fig.add_subplot(1, 1, 1)
 ax1.set_title('Wet Bulb Globe Temperature' + ', ' + location.upper())
-#ax1.set_xticks([0, 3, 6, 9, 12, 15, 18, 21, 24])
+ax1.set_xticks([0, 3, 6, 9, 12, 15, 18, 21, 24])
 ax1.set_xlabel('Hour of the Day (MST)')
 ax1.set_ylabel('WBGT (F)')
 

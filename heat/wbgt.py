@@ -10,8 +10,8 @@ import math
 
 # Constants needed.
 # Local.
-T0 = 273.16  # Freezing point, K.
-R = 287.05  # Specific gas constant for dry air, J/mol-K
+T0 = 273.15  # Freezing point, K.
+R = 287.05  # Specific gas constant for dry air, J/kg-K
 CP = 1005.0  # Specific heat of dry air at constant pressure.
 MW = 0.018015  # Molecular weight of water, kg/mol
 MAIR = 0.028964  # Molecular weight of dry air, kg/mol
@@ -795,7 +795,6 @@ def calcWbgt(yyyymmddhhmn,
                                    T2m, e2m, wspd10m, pSfc, cloudFrac,
                                    swdn, swup, lwdn, lwup,
                                    verbosity)
-    
     # Calculate mean radiant temperature.
     Tmrt = calc_Tmrt(latitude, longitude, dt,
                      T2m, e2m, pSfc, cloudFrac,
@@ -880,13 +879,13 @@ def calcWbgt(yyyymmddhhmn,
         if abs(Twet-TwetPrev) <= 0.02:  # Iterate until the difference becomes small.
             converged = True
         TwetPrev = 0.9*TwetPrev + 0.1*Twet  # Value for next iteration.
-    # Revert to simple estimation if the result of the iteration is too far off.
+    # Revert to simpler estimation if the result of the iteration is too far off.
     diffWetDew = Twet - Td2m
     if abs((Twet > T2m) or
            abs(diffWetDew) >= 30.0):
         Twet = (2.0/3.0)*T2m + (1.0/3.0)*Td2m
         if verbosity > 1:
-            print('WARNING: Bad iteration, reverted to simple approximation')
+            print('WARNING: Bad iteration, reverted to simpler approximation')
     if verbosity > 1:
         print("Final wet bulb temperature: {:.1f} K = {:.1f} C = {:.1f} F".format(Twet, Twet-T0, TC2F(Twet-T0)))
     if not converged:
@@ -921,12 +920,35 @@ def calcWbgt(yyyymmddhhmn,
                    (h/(EMIS_GLOBE*SB))*(TglobePrev-T2m) +
                    (solarDownGlobal/(2.0*EMIS_GLOBE*SB))*(1.0-ALBEDO_GLOBE)*
                    (1.0+(1.0/(2.0*cosZenith)-1.0)*fDir+ALBEDO_SFC))
+        # Prevent negative values which would produce complex numbers when
+        #   raised to 0.25.
+        Tglobe4 = max(Tglobe4, 0.0)
         Tglobe = Tglobe4 ** 0.25
         if verbosity > 1:
             print('  ','iter:', iter, TglobePrev, '->', Tglobe, 'difference:', Tglobe-TglobePrev)
         if abs(Tglobe-TglobePrev) <= 0.02:  # Iterate until the difference becomes small.
             converged = True
         TglobePrev = 0.9*TglobePrev + 0.1*Tglobe  # Go to next iteration.
+    # Revert to simpler estimation if the result of the iteration is too far off.
+    diffGlobe = Tglobe - TglobePrev
+    if abs(diffGlobe) >= 30.0:
+        # Fall back to using Dimiceli and Piltz method to estimate
+        #  the globe temperature.
+        eA = (math.exp((17.67*(Td2mC-T2mC))/(Td2mC+243.5)) *
+              (1.0007+0.00000346*pSfc) *
+              6.112*math.exp(17.502*T2mC/(240.97+T2mC)))
+        epsA = 0.575 * eA**(1.0/7.0)
+        sigmaD = 5.67e-8
+        bDimicceli = ((solarDownGlobal*
+                       ((solarDownDirect/(4.0*sigmaD*cosZenith)) +
+                        (1.2/sigmaD)*solarDownDiffuse)) +
+                      epsA*(T2mC**4.0))
+        hD = 0.315
+        cDimiceli = hD*(wspd10m**0.58) / 5.3865e-8 
+        Tglobe = (bDimiceli+cDimiceli*T2mC+7680000.0) / (cDimiceli+256000.0)
+        print('Tglobe Dimiceli:', Tglobe); sys.exit()
+        if verbosity > 1:
+            print('WARNING: Bad iteration, reverted to simpler approximation')
     if verbosity > 1:
         print("Final globe temperature: {:.1f} K = {:.1f} C = {:.1f} F".format(Tglobe, Tglobe-T0, TC2F(Tglobe-T0)))
     if not converged:
