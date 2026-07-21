@@ -17,7 +17,7 @@ locations = ['ta6', 'ta54']
 # ----------------------------------------------------------------
 # Copy the latest 48 hour dat files from Sean's S3 bucket.
 # ----------------------------------------------------------------
-print('\Copy the latest 48 hour dat files from Seans S3 bucket:')
+print('\nCopy the latest 48 hour dat files from Seans S3 bucket:')
 for location in locations:
     print('   ', location)
     dat48Path = 's3://446936272237-lanlwmbucket1-production/wet-bulb-data/'
@@ -75,9 +75,38 @@ for location in locations:
     subprocess.run(command)
 
 # ----------------------------------------------------------------
-# Copy plots and html tables to the S3 bucket.
+# Write an HTML file with the current WBGT and related info.
 # ----------------------------------------------------------------
-print('\Copy plots and html tables to S3 bucket:')
+print('\nWrite current WBGT and related info to an HTML file:')
+dat2wbgtFile1 = 'dat2wbgt' + '.' + locations[0] + '.csv'
+dat2wbgtFile2 = 'dat2wbgt' + '.' + locations[1] + '.csv'
+command = ['python3', 'currentWbgtHtml.py', dat2wbgtFile1, dat2wbgtFile2]
+print(command)
+subprocess.run(command)
+
+# ----------------------------------------------------------------
+# Make a WBGT time series plot for each location.
+# ----------------------------------------------------------------
+print('\nPlot WBGT time series:')
+for location in locations:
+    print('   ', location)
+    dat2wbgtFile = 'dat2wbgt' + '.' + location + '.csv'
+    command = ['python3', 'plotWbgtDays.py', dat2wbgtFile]
+    #print(command)
+    subprocess.run(command)
+    # Add location name to resulting png and html files.
+    pngFile = 'wbgt.' + location.upper() + '.png'
+    htmlFile = 'wbgt.' + location.upper() + '.html'
+    command = ['mv', 'wbgt.png', pngFile]
+    #print(command)
+    subprocess.run(command)
+    command = ['mv', 'wbgt.html', htmlFile]
+    #print(command)
+    subprocess.run(command)
+# ----------------------------------------------------------------
+# Copy plots and html files to the S3 bucket.
+# ----------------------------------------------------------------
+print('\nCopy plots and html tables to S3 bucket:')
 for location in locations:
     print('   ', location)
     plotFile = 'wbgt' + '.' + location.upper() + '.png'
@@ -89,3 +118,9 @@ for location in locations:
                's3://weather.lanl.gov/visualization_assets/' + htmlFile]
     #print(command)
     subprocess.run(command)
+
+htmlFile = 'wbgt_current.html'
+command = ['aws', 's3', 'cp', htmlFile, 
+           's3://weather.lanl.gov/visualization_assets/' + htmlFile]
+print(command)
+subprocess.run(command)

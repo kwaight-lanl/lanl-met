@@ -45,7 +45,7 @@ ax1.set_title('Wet Bulb Globe Temperature' + ', ' + location.upper())
 
 # Read data into a dataframe.
 wbgtData1 = pd.read_csv(tower2wbgtFile, parse_dates=True)
-print(wbgtData1)
+#print(wbgtData1)
 wbgtData1Html = wbgtData1[['dts','wspd10m(mph)','RH','T2m(F)','WBGT(F)']]
 htmlFile = 'wbgt.html'
 htmlOut = open(htmlFile, 'w')
@@ -53,7 +53,7 @@ htmlOut.write(wbgtData1Html.to_html())
 
 #print('pd.read_csv'); sys.exit()
 wbgtData['ta6'] = wbgtData1
-print('wbgtData:', wbgtData['ta6'])
+#print('wbgtData:', wbgtData['ta6'])
 
 # Create a dataframe with all of the variables in the csv file.
 #df = pd.DataFrame(wbgtData['ta6']['datetime'])
@@ -61,7 +61,7 @@ print('wbgtData:', wbgtData['ta6'])
 df = pd.DataFrame(wbgtData['ta6']['dts'])
 df.time = pd.to_datetime(df.dts)
 df['wbgt'] = wbgtData['ta6']['WBGT(F)']
-print(df)
+#print(df)
 # Create a time series from the datetime and WBGT columns.
 wbgts = wbgtData['ta6']['WBGT(F)'].values
 dates = wbgtData['ta6']['dts'].values
@@ -70,10 +70,10 @@ for date in dates:
     dt = datetime.strptime(date,'%m/%d/%Y %H:%M')
     dts.append(dt)
 tsAll = pd.Series(wbgts, index=dts)
-print('wbgts:', wbgts)
-print('dates:', dates)
-print('dts:', dts)
-print('tsAll:', tsAll)
+#print('wbgts:', wbgts)
+#print('dates:', dates)
+#print('dts:', dts)
+#print('tsAll:', tsAll)
 # Extract the dates in the time series.
 dataDates = []
 for date in dates:
@@ -81,10 +81,10 @@ for date in dates:
     if day not in dataDates:
         dataDates.append(day)
 most_recent_date = df['dts'].max()[0:10]
-print('most_recent_date:', most_recent_date)
+#print('most_recent_date:', most_recent_date)
 mmddyyyyLatest = datetime.strptime(most_recent_date, '%m/%d/%Y')
 #mmddyyyyLatest = str(most_recent_date)[0:10]
-print('mmddyyyyLatest:', mmddyyyyLatest)
+#print('mmddyyyyLatest:', mmddyyyyLatest)
 #dfToday = df[mmddyyyyLatest:]
 
 # Create an html table from the data frame.
@@ -92,11 +92,11 @@ print('mmddyyyyLatest:', mmddyyyyLatest)
 # Slice each individual day from complete time series.
 print('Slice individual dataDates:', dataDates)
 tsDay = {}
-print('tsAll:', tsAll)
+#print('tsAll:', tsAll)
 for dataDate in dataDates:
-    print('dataDate:', dataDate)
+    #print('dataDate:', dataDate)
     tsSliced = tsAll[dataDate]
-    print('tsSliced:', tsSliced)
+    #print('tsSliced:', tsSliced)
     hours = []
     wbgts = []
     for dt, value in tsSliced.items():
