@@ -24,8 +24,11 @@ for location in locations:
     dat48DatFile = location + '-last48hours.dat'
     command = ['aws', 's3', 'cp', 
                dat48Path + dat48DatFile, '.']
-    #print(command)
-    subprocess.run(command)
+    print("Command:", command)
+    result = subprocess.run(command, capture_output=True, text=True)
+    print("Output:", result.stdout)
+    print("Errors:", result.stderr)
+    print("Exit Code:", result.result.returncode)
 
 # ----------------------------------------------------------------
 # Read latest last 48 hr dat file. Calculate WBGT and write output
@@ -116,11 +119,17 @@ for location in locations:
     subprocess.run(command)
     command = ['aws', 's3', 'cp', htmlFile, 
                's3://weather.lanl.gov/visualization_assets/' + htmlFile]
-    #print(command)
-    subprocess.run(command)
+    print("Command:", command)
+    result = subprocess.run(command, capture_output=True, text=True)
+    print("Output:", result.stdout)
+    print("Errors:", result.stderr)
+    print("Exit Code:", result.result.returncode)
 
 htmlFile = 'wbgt_current.html'
 command = ['aws', 's3', 'cp', htmlFile, 
            's3://weather.lanl.gov/visualization_assets/' + htmlFile]
-print(command)
-subprocess.run(command)
+print("Command:", command)
+result = subprocess.run(command, capture_output=True, text=True)
+print("Output:", result.stdout)
+print("Errors:", result.stderr)
+print("Exit Code:", result.result.returncode)
