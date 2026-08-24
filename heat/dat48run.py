@@ -27,8 +27,8 @@ for location in locations:
     print("Command:", command)
     result = subprocess.run(command, capture_output=True, text=True)
     print("Output:", result.stdout)
+    print('after output')
     print("Errors:", result.stderr)
-    print("Exit Code:", result.result.returncode)
 
 # ----------------------------------------------------------------
 # Read latest last 48 hr dat file. Calculate WBGT and write output
@@ -123,7 +123,6 @@ for location in locations:
     result = subprocess.run(command, capture_output=True, text=True)
     print("Output:", result.stdout)
     print("Errors:", result.stderr)
-    print("Exit Code:", result.result.returncode)
 
 htmlFile = 'wbgt_current.html'
 command = ['aws', 's3', 'cp', htmlFile, 
@@ -132,4 +131,3 @@ print("Command:", command)
 result = subprocess.run(command, capture_output=True, text=True)
 print("Output:", result.stdout)
 print("Errors:", result.stderr)
-print("Exit Code:", result.result.returncode)
