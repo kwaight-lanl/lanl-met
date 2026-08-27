@@ -1,65 +1,66 @@
-#!/usr/bin/env python3
-import csv
 import argparse
+import csv
 
-def convert_weather_format(input_path, output_path):
-    # Define the exact headers for the new format
+def convert_format(input_file_path, output_file_path):
+    # Mapping for old format columns to new format columns
+    # 'New Column Name': 'Old Column Name'
+    column_mapping = {
+        'TA54B_24_ID': 'TA54B_24_ID',
+        'DTS': 'DTS',
+        'DOY': 'DOY',
+        'MXGST1': 'MXGST1',
+        'DIRGST1': 'DIRGST1',
+        'MX1GST': 'MX1GST',
+        'MXTEMP': 'MXTEMP',
+        'TMXTEMP': 'TMXTEMP',
+        'MNTEMP': 'MNTEMP',
+        'TMNTEMP': 'TMNTEMP',
+        'CREATED_ON': 'CREATED_ON',
+        'CREATED_BY': 'CREATED_BY',
+        'UPD_ON': 'UPD_ON',
+        'UPD_BY': 'UPD_BY',
+        'PLACEHOLDER_FLAG': 'PLACEHOLDER_FLAG',
+        'DIR1GST': 'MX1DIR'  # Explicitly mapped from old format MX1DIR
+    }
+
+    # Desired header structure and column order for the new format
     new_headers = [
-        "TA54B_24_ID", "DTS", "DOY", "MXGST1", "DIRGST1", "MX1GST", "MXTEMP", 
-        "TMXTEMP", "MNTEMP", "TMNTEMP", "CREATED_ON", "CREATED_BY", "UPD_ON", 
-        "UPD_BY", "PLACEHOLDER_FLAG", "AVGSPD1", "TGST1", "DIR1GST", "T1GST", 
-        "AVGRH", "MXRH", "MNRH", "AVGDEWP", "MXDEWP", "MNDEWP"
+        'TA54B_24_ID', 'DTS', 'DOY', 'MXGST1', 'DIRGST1', 'MX1GST', 
+        'MXTEMP', 'TMXTEMP', 'MNTEMP', 'TMNTEMP', 'CREATED_ON', 
+        'CREATED_BY', 'UPD_ON', 'UPD_BY', 'PLACEHOLDER_FLAG', 
+        'AVGSPD1', 'TGST1', 'DIR1GST', 'T1GST', 'AVGRH', 'MXRH', 
+        'MNRH', 'AVGDEWP', 'MXDEWP', 'MNDEWP'
     ]
 
-    try:
-        with open(input_path, mode='r', newline='', encoding='utf-8') as infile:
-            reader = csv.DictReader(infile)
-            
-            # Check if input file is empty or missing headers
-            if not reader.fieldnames:
-                raise ValueError("Input file is empty or has invalid headers.")
-
-            # Identify overlapping headers between old and new format
-            overlapping_headers = [header for header in new_headers if header in reader.fieldnames]
-
-            rows_to_write = []
-            for row in reader:
-                new_row = {}
-                for header in new_headers:
-                    if header in overlapping_headers:
-                        # Copy the value if the column exists in the old format
-                        new_row[header] = row[header]
-                    else:
-                        # Leave blank if it's a new column not present in the old format
-                        new_row[header] = ""
-                rows_to_write.append(new_row)
-
-        with open(output_path, mode='w', newline='', encoding='utf-8') as outfile:
+    with open(input_file_path, mode='r', newline='', encoding='utf-8') as infile:
+        reader = csv.DictReader(infile)
+        
+        with open(output_file_path, mode='w', newline='', encoding='utf-8') as outfile:
             writer = csv.DictWriter(outfile, fieldnames=new_headers)
             writer.writeheader()
-            writer.writerows(rows_to_write)
 
-        print(f"Successfully converted data and wrote to: {output_path}")
+            for row in reader:
+                new_row = {}
+                for new_header in new_headers:
+                    # Check if the field maps to an existing old field
+                    if new_header in column_mapping:
+                        old_field = column_mapping[new_header]
+                        new_row[new_header] = row.get(old_field, '')
+                    else:
+                        # Fields in the new format but not in the old format are left blank
+                        new_row[new_header] = ''
+                
+                writer.writerow(new_row)
 
-    except FileNotFoundError:
-        print(f"Error: The input file '{input_path}' was not found.")
-    except Exception as e:
-        print(f"An error occurred: {e}")
-
-if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser(
-        description="Convert historical TA54B 24-hour weather data from the old format to the new format."
+        description="Convert LANL TA54B 24hr weather data from old format to new format."
     )
-    
-    # Positional arguments (no flags like -i or -o required)
-    parser.add_argument(
-        "input_file_path", 
-        help="Path to the input file in the old format (e.g., ta54b_24_athena_01012026.txt)"
-    )
-    parser.add_argument(
-        "output_file_path", 
-        help="Path where the converted file should be saved (e.g., ta54b_24_athena_07222026.txt)"
-    )
+    parser.add_argument("input_file_path", help="Path to the input file in old format.")
+    parser.add_argument("output_file_path", help="Path to the output file in new format.")
 
     args = parser.parse_args()
-    convert_weather_format(args.input_file_path, args.output_file_path)
+    convert_format(args.input_file_path, args.output_file_path)
+
+if __name__ == "__main__":
+    main()
