@@ -148,7 +148,7 @@ for section in sections3:
 # ===============
 # Build the code.
 # ===============
-print('\nBuilding code file:', codeFile, '\n')
+print('\nAssembling logger program from fragments:', codeFile, '\n')
 with open(codeFile, 'w') as codeOut:
 
     # ----------------------------------
