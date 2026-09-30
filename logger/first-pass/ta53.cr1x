@@ -1,5 +1,5 @@
-' Built with assemble.py: 2026-09-29 14:59
-' assemble.py -tables dat1min dat15min dat24hr opsMonitor -parts battery cr1000x wind-horiz-1 wind-horiz-2 wind-horiz-3 wind-vert-1 wind-vert-2 wind-vert-3 temp-metone-0 temp-metone-1 temp-metone-2 temp-metone-3 rh-rotronics-0 precip swdn TA53 -o ta53.cr1x
+' Built with assemble.py: 2026-09-30 15:37
+' assemble.py -tables dat1min dat15min dat24hr opsMonitor -parts cr1000x wind-horiz-1 wind-horiz-2 wind-horiz-3 wind-vert-1 wind-vert-2 wind-vert-3 temp-metone-0 temp-metone-1 temp-metone-2 temp-metone-3 rh-rotronics-0 precip swdn TA53 -o ta53.cr1x
 
 
 ' =============================
@@ -91,7 +91,6 @@
 ' ==================================
 ' List of equipment and instruments.
 ' ==================================
-' Battery bank, PV charging hardware
 ' Campbell Scientific CR1000X datalogger
 ' RM Young 05305-AQ Horizontal Wind Speed & Direction Sensor (Level 1)
 ' RM Young 05305-AQ Horizontal Wind Speed & Direction Sensor (Level 2)
@@ -105,7 +104,7 @@
 ' RM Young 41382VC Air Temp and RH (Level 3)
 ' Rotronics MP101A Air Temp & RH Sensor (Level 0)
 ' All Weather Tipping Bucket Rain Gauge
-' Eppley PSP1 Precision Spectral Pyranometer 
+' Eppley Precision Spectral Pyranometer *Note: Facing up (swdn)
 
 
 ' ====================
@@ -170,13 +169,6 @@ Const PScan=3  'enter program execution interval in seconds
 Public hh, mm
 Units hh = hours
 Units mm = minutes
-
-' Battery
-Public BattV, PTemp_C
-Public PVVolts
-Units BattV=V
-Units PTemp_C=deg C
-Units PVVolts=V
 
 ' RM Young 05305-AQ Horizontal Wind Speed & Direction Sensor (Level 1)
 Public spd1, dir1
@@ -283,10 +275,10 @@ Units mndewp=deg C
 Public precip
 Units precip=in
 
-' Eppley PSP1 Precision Spectral Pyranometer
-Public swdn_measure, swdn_Wm2, swdn_MJm2
+' Eppley Precision Spectral Pyranometer *Note: Facing up (swdn)
+Public swdn_measure, swdn, swdn_MJm2
 Units swdn_measure=uV
-Units swdn_Wm2=W/m^2
+Units swdn=W/m^2
 Units swdn_MJm2=MJ/m^2
 
 Const PSP1Cal=8.69  ' Enter PSP1Cal = Eppley Sensitivity Cal Constant in microVolt/WM^2 for this tower
@@ -339,11 +331,35 @@ DataTable(Dat15min,True,-1)
   StdDev(1,w1,FP2,False)  
   FieldNames("sdw1")
 
+  ' RM Young 27106T Vertical Wind Speed Sensor (Level 2)
+  Average(1,w2,FP2,False)  
+  FieldNames("w2")
+  StdDev(1,w2,FP2,False)  
+  FieldNames("sdw2")
+
+  ' RM Young 27106T Vertical Wind Speed Sensor (Level 3)
+  Average(1,w3,FP2,False)  
+  FieldNames("w3")
+  StdDev(1,w3,FP2,False)  
+  FieldNames("sdw3")
+
   '  MetOne 060A2 Air Temp Sensor(Level 0)
   Average(1,temp0,FP2,False)
   FieldNames("temp0")
   Sample(1, mntemptoday, FP2)
   Sample(1, mxtemptoday, FP2)
+
+  '  MetOne 060A2 Air Temp Sensor(Level 1)
+  Average(1,temp1,FP2,False)
+  FieldNames("temp1")
+
+  '  MetOne 060A2 Air Temp Sensor(Level 2)
+  Average(1,temp2,FP2,False)
+  FieldNames("temp2")
+
+  '  MetOne 060A2 Air Temp Sensor(Level 3)
+  Average(1,temp3,FP2,False)
+  FieldNames("temp3")
 
   ' Rotronics MP101A Air Temp & RH Sensor (Level 0)
   Average(1,rh,FP2,False)
@@ -352,8 +368,8 @@ DataTable(Dat15min,True,-1)
   'All Weather Tipping Bucket Rain Gauge
   Totalize(1,precip,FP2,False)  
 
-  ' Eppley PSP1 Precision Spectral Pyranometer
-  Average(1,swdn_Wm2,IEEE4,False)  'Average solar irradiance
+  ' Eppley Precision Spectral Pyranometer *Note: Facing down (swdn)
+  Average(1,swdn,IEEE4,False)  'Average solar irradiance
 EndTable
 
 DataTable(Dat24hr,True,-1)
@@ -405,19 +421,13 @@ DataTable(Dat24hr,True,-1)
   Totalize(1,precip,FP2,False)  
   Fieldnames("tprecip")
 
-  ' Eppley PSP1 Precision Spectral Pyranometer
+  ' Eppley Precision Spectral Pyranometer *Note: Facing down (swdn)
   Totalize(1,swdn_MJm2,IEEE4,False)  'Total flux density
   FieldNames("swedn")
 EndTable
 
 DataTable(OpsMonitor,True,-1)
   DataInterval(0,15,Min,0)
-
-  ' Battery
-  Average(1,BattV,FP2,False)
-  Average(1,PTemp_C,FP2,False)
-  FieldNames("PTemp_AVGDegC")
-  Average(1,PVVolts,FP2,False)
 
   ' MetOne 060A2 Air Temp Sensor(Level 0)
   Average (1,fan0,FP2,False) 
@@ -436,14 +446,6 @@ BeginProg
 ' Main Loop.        
 ' ====================
   Scan(3,Sec,1,0)
-
-    ' Battery
-    ' Datalogger Battery Voltage measurement 'BattV'
-    Battery(BattV)
-    ' Datalogger Wiring Panel Temperature measurement 'PTemp_C'
-    PanelTemp(PTemp_C,_60Hz)
-    ' Monitor exactly how high the sun voltage is being provided by the Solar Panels throughout the day.
-    VoltDiff(PVVolts,1,mV5000,d_pvvolts,True,500,60,0.01,0)
 
     ' RM Young 05305-AQ Wind Speed & Direction Sensor (Level 1)
     ' Measure instantaneous wind speed and direction.
@@ -632,10 +634,10 @@ BeginProg
 	'4 	High frequency with pull down (Control ports only)
 	'5 	Low Level AC (Pulse channels only)
 
-    ' Eppley PSP1 Precision Spectral Pyranometer
+    ' Eppley Precision Spectral Pyranometer *Note: Facing down (swdn)
     VoltDiff(swdn_measure,1,mV20,d_swdn,True,0,_60Hz,1000,0)
-    swdn_Wm2=swdn_measure/PSP1Cal  'in W/m2
-    swdn_MJm2=(swdn_Wm2/1000000)*PScan  'in MJ/m2
+    swdn=swdn_measure/SWDNCal  'in W/m2
+    swdn_MJm2=(swdn/1000000)*PScan  'in MJ/m2
 
 ' =================
 ' Table calls
@@ -672,12 +674,5 @@ BeginProg
       mxtemptoday = -99
     EndIf
   NextScan
-
-  If TimeIntoInterval (0,1,Day) Then
-    HWSpd2Max24Hr=0
-    HWDir2Max24Hr=0
-    HW2Max24HrTime(4)=0  'hour
-    HW2Max24HrTime(5)=0  'minute
-  EndIf
 
 EndProg

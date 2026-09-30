@@ -1,5 +1,5 @@
-' Built with assemble.py: 2026-09-30 14:18
-' assemble.py -tables dat1min dat15min dat24hr opsMonitor -parts battery cr1000x wind-horiz-1 wind-horiz-2 wind-horiz-3 wind-vert-1 wind-vert-2 wind-vert-3 temp-metone-0 temp-metone-1 temp-metone-2 temp-metone-3 rh-rotronics-0 precip swdn swup lwdn lwup netrad fm1hr fm10hr pressure TA54 -o ta54.cr1x
+' Built with assemble.py: 2026-09-30 15:37
+' assemble.py -tables dat1min dat15min dat24hr opsMonitor -parts cr1000x wind-horiz-1 wind-horiz-2 wind-horiz-3 wind-vert-1 wind-vert-2 wind-vert-3 temp-metone-0 temp-metone-1 temp-metone-2 temp-metone-3 rh-rotronics-0 precip swdn swup lwdn lwup netrad fm1hr fm10hr pressure TA54 -o ta54.cr1x
 
 
 ' =============================
@@ -135,7 +135,6 @@
 ' ==================================
 ' List of equipment and instruments.
 ' ==================================
-' Battery bank, PV charging hardware
 ' Campbell Scientific CR1000X datalogger
 ' RM Young 05305-AQ Horizontal Wind Speed & Direction Sensor (Level 1)
 ' RM Young 05305-AQ Horizontal Wind Speed & Direction Sensor (Level 2)
@@ -237,13 +236,6 @@ Const PScan=3  'enter program execution interval in seconds
 Public hh, mm
 Units hh = hours
 Units mm = minutes
-
-' Battery
-Public BattV, PTemp_C
-Public PVVolts
-Units BattV=V
-Units PTemp_C=deg C
-Units PVVolts=V
 
 ' RM Young 05305-AQ Horizontal Wind Speed & Direction Sensor (Level 1)
 Public spd1, dir1
@@ -600,12 +592,6 @@ EndTable
 DataTable(OpsMonitor,True,-1)
   DataInterval(0,15,Min,0)
 
-  ' Battery
-  Average(1,BattV,FP2,False)
-  Average(1,PTemp_C,FP2,False)
-  FieldNames("PTemp_AVGDegC")
-  Average(1,PVVolts,FP2,False)
-
   ' MetOne 060A2 Air Temp Sensor(Level 0)
   Average (1,fan0,FP2,False) 
 EndTable
@@ -623,14 +609,6 @@ BeginProg
 ' Main Loop.        
 ' ====================
   Scan(3,Sec,1,0)
-
-    ' Battery
-    ' Datalogger Battery Voltage measurement 'BattV'
-    Battery(BattV)
-    ' Datalogger Wiring Panel Temperature measurement 'PTemp_C'
-    PanelTemp(PTemp_C,_60Hz)
-    ' Monitor exactly how high the sun voltage is being provided by the Solar Panels throughout the day.
-    VoltDiff(PVVolts,1,mV5000,d_pvvolts,True,500,60,0.01,0)
 
     ' RM Young 05305-AQ Wind Speed & Direction Sensor (Level 1)
     ' Measure instantaneous wind speed and direction.
