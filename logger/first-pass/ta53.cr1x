@@ -1,0 +1,683 @@
+' Built with assemble.py: 2026-09-29 14:59
+' assemble.py -tables dat1min dat15min dat24hr opsMonitor -parts battery cr1000x wind-horiz-1 wind-horiz-2 wind-horiz-3 wind-vert-1 wind-vert-2 wind-vert-3 temp-metone-0 temp-metone-1 temp-metone-2 temp-metone-3 rh-rotronics-0 precip swdn TA53 -o ta53.cr1x
+
+
+' =============================
+' Wiring information, comments.
+' =============================
+
+'  RMYoung 05305-AQ Wind Speed & Direction Sensor (1)
+'    1H:  HWDir Signal Yellow
+'    Ground:  WSpd reference Green
+'    Ground:  Cable Shield White
+'    Ground:  WDir reference Black
+'    VX1:  HWDir Excite Blue
+'    P1:  HWspd Signal Red
+'
+'  RMYoung 05305-AQ Wind Speed & Direction Sensor (2)
+'    1L:  HWDir Signal Yellow
+'    Ground:  WSpd reference Green
+'    Ground:  Cable Shield White
+'    Ground:  WDir reference Black
+'    VX1:  HWDir Excite Blue
+'    P2:  HWspd Signal Red
+'
+'  RMYoung 05305-AQ Wind Speed & Direction Sensor (3)
+'    2H:  HWDir Signal Yellow
+'    Ground:  WSpd reference Green
+'    Ground:  Cable Shield White
+'    Ground:  WDir reference Black
+'    VX1:  HWDir Excite Blue
+'    P3:  HWspd Signal Red
+'
+'  RMYoung 27106T Wind Speed Sensor (1)
+'    3H:  VWspd Signal Red
+'    Ground:  WSpd reference Black
+'    Ground:  Cable Shield Clear?
+'
+'  RMYoung 27106T Wind Speed Sensor (2)
+'    3L:  VWspd Signal Red
+'    Ground:  WSpd reference Black
+'    Ground:  Cable Shield Clear?
+'
+'  RMYoung 27106T Wind Speed Sensor (3)
+'    4H:  VWspd Signal Red
+'    Ground:  WSpd reference Black
+'    Ground:  Cable Shield Clear?
+'
+'  MetOne 060A2 Air Temp Sensor(1)
+'    5H:  Air Temp Signal White
+'    Ground:  Air Temp reference Black
+'    Ground:  Cable shield
+'    VX2:  Excite *Wire a 23.1Kohm resistor between VX2 & 5H
+'
+'  MetOne 060A2 Air Temp Sensor (2)
+'    5L:  Air Temp Signal White
+'    Ground:  Air Temp reference Black
+'    Ground:  Cable shield
+'    VX2:  Excite *Wire a 23.1Kohm resistor between VX2 & 5L
+'
+'  MetOne 060A2 Air Temp Sensor (3)
+'    6H:  Air Temp Signal White
+'    Ground:  Air Temp reference Black
+'    Ground:  Cable shield
+'    VX2:  Excite *Wire a 23.1Kohm resistor between VX2 & 6H
+'
+'  MetOne 060A2 Air Temp Sensor (4)
+'    6L:  Air Temp Signal White
+'    Ground:  Air Temp reference Black
+'    Ground:  Cable shield
+'    VX2:  Excite *Wire a 23.1Kohm resistor between VX2 & 6L
+'
+'  Rotronics MP101A Air Temp & RH Sensor (constant power)
+'    7L:  Air Temperature Siganl Red(Brown)
+'    8H:  RH Signal White
+'    Ground:  Signal Ground Yellow
+'    Ground:  Power Ground Green
+'    Ground:  Cable Shield Clear?
+'    12V:  Power Blue
+'
+' Eppley PSP1 Precision Spectral Pyranometer (1)
+'    9H:  Signal+ Green
+'    9L:  Signal- Blue
+' *Note: Jumper wire 9L -to- ground
+'    Ground:  Cable shield Clear?
+'
+'  All Weather Rain Gauge wired to a control port
+'    Ground:  Cable Shield Clear?
+'    P4:  Signal+ Red
+'     G:  Signal- Black
+
+' ==================================
+' List of equipment and instruments.
+' ==================================
+' Battery bank, PV charging hardware
+' Campbell Scientific CR1000X datalogger
+' RM Young 05305-AQ Horizontal Wind Speed & Direction Sensor (Level 1)
+' RM Young 05305-AQ Horizontal Wind Speed & Direction Sensor (Level 2)
+' RM Young 05305-AQ Horizontal Wind Speed & Direction Sensor (Level 3)
+' RM Young 27106T Vertical Wind Speed Sensor (Level 1)
+' RM Young 27106T Vertical Wind Speed Sensor (Level 2)
+' RM Young 27106T Vertical Wind Speed Sensor (Level 3)
+' RM Young 41382VC Air Temp and RH (Level 0)
+' RM Young 41382VC Air Temp and RH (Level 1)
+' RM Young 41382VC Air Temp and RH (Level 2)
+' RM Young 41382VC Air Temp and RH (Level 3)
+' Rotronics MP101A Air Temp & RH Sensor (Level 0)
+' All Weather Tipping Bucket Rain Gauge
+' Eppley PSP1 Precision Spectral Pyranometer 
+
+
+' ====================
+' Definitions.
+' ====================
+' Data logger channel assignments and declared variables.
+
+' RM Young 05305-AQ Horizontal Wind Speed & Direction Sensor (Level 1)
+Const p_wind_horiz_lev1 = P1 'Horiz WindSpeed P1 Channel
+Const se_wind_horiz_lev1 = 11 'Horiz WindDirection SE11 Channel
+Const ex_wind_horiz_lev1 = VX2 'WindDirection Excite VX2 Terminal
+
+' RM Young 27106T Vertical Wind Speed Sensor (Level 1)
+Const se_wind_vert_lev1 = 7 ' Vert WindSpeed SE7 Channel
+
+' RM Young 05305-AQ Horizontal Wind Speed & Direction Sensor (Level 2)
+Const p_wind_horiz_lev2 = P1 'Horiz WindSpeed P1 Channel
+Const se_wind_horiz_lev2 = 11 'Horiz WindDirection SE11 Channel
+Const ex_wind_horiz_lev2 = VX2 'WindDirection Excite VX2 Terminal
+
+' RM Young 27106T Vertical Wind Speed Sensor (Level 2)
+Const se_wind_vert_lev2 = 7 ' Vert WindSpeed SE7 Channel
+
+' RM Young 05305-AQ Horizontal Wind Speed & Direction Sensor (Level 3)
+Const p_wind_horiz_lev3 = P1 'Horiz WindSpeed P1 Channel
+Const se_wind_horiz_lev3 = 11 'Horiz WindDirection SE11 Channel
+Const ex_wind_horiz_lev3 = VX2 'WindDirection Excite VX2 Terminal
+
+' RM Young 27106T Vertical Wind Speed Sensor (Level 3)
+Const se_wind_vert_lev3 = 7 ' Vert WindSpeed SE7 Channel
+
+' MetOne 060A2 Air Temp Sensor (Level 0)
+Const se_temp_metone_lev0 = 1
+Const ex_temp_metone_lev0 = 1
+Const p_fan_lev0 = 1
+
+' Rotronics MP101A Air Temp & RH Sensor (Level 0)
+se_rh_rotronics_lev0 = 15
+
+' MetOne 060A2 Air Temp Sensor (Level 1)
+Const se_temp_metone_lev1 = 1
+Const ex_temp_metone_lev1 = 1
+Const p_fan_lev1 = 1
+
+' MetOne 060A2 Air Temp Sensor (Level 2)
+Const se_temp_metone_lev2 = 1
+Const ex_temp_metone_lev2 = 1
+Const p_fan_lev2 = 1
+
+' MetOne 060A2 Air Temp Sensor (Level 3)
+Const se_temp_metone_lev3 = 1
+Const ex_temp_metone_lev3 = 1
+Const p_fan_lev3 = 1
+
+
+
+' ====================
+' Declare Variables.
+' ====================
+Const PScan=3  'enter program execution interval in seconds
+' Variables used by multiple instruments.
+Public hh, mm
+Units hh = hours
+Units mm = minutes
+
+' Battery
+Public BattV, PTemp_C
+Public PVVolts
+Units BattV=V
+Units PTemp_C=deg C
+Units PVVolts=V
+
+' RM Young 05305-AQ Horizontal Wind Speed & Direction Sensor (Level 1)
+Public spd1, dir1
+Public mxgst1, dirgst1
+Public HW1Max24HrTime(9) 
+Public mx1gst, dir1gst
+Public HWTime1_1min(9)
+Public mxgsttoday
+Public tgst1 As String * 4
+Public t1gst As String * 4
+Units spd1=m/s
+Units mxgst1=m/s
+Units mx1gst=m/s
+Units dirgst1=deg
+Units dir1gst=deg
+Units dir1=deg
+Units mxgsttoday = m/s
+Units tgst1 = 24-hr-time
+Units t1gst = 24-hr-time
+
+' RM Young 05305-AQ Horizontal Wind Speed & Direction Sensor (Level 2)
+Public spd2, dir2
+Public mxgst2, dirgst2
+Public HW2Max24HrTime(9) 
+Public tgst2 As String * 4
+Units spd2=m/s
+Units mxgst2=m/s
+Units dirgst2=deg
+Units dir2=deg
+Units tgst2 = 24-hr-time
+
+' RM Young 05305-AQ Horizontal Wind Speed & Direction Sensor (Level 3)
+Public spd3, dir3
+Public mxgst3, dirgst3
+Public HW3Max24HrTime(9) 
+Public tgst3 As String * 4
+Units spd3=m/s
+Units mxgst3=m/s
+Units dirgst3=deg
+Units dir3=deg
+Units tgst3 = 24-hr-time
+
+' RM Young 27106T Vertical Wind Speed Sensor (Level 1)
+Public w1
+Units w1=m/s
+
+' RM Young 27106T Vertical Wind Speed Sensor (Level 2)
+Public w2
+Units w2=m/s
+
+' RM Young 27106T Vertical Wind Speed Sensor (Level 3)
+Public w3
+Units w3=m/s
+
+' MetOne 060A2 Air Temp Sensor (Level 0)
+Public temp0
+Public mntemptoday = 99.0
+Public mxtemptoday = -99.0
+Public MinTime(9)
+Public MaxTime(9)
+Public tmntemp As String * 4
+Public tmxtemp As String * 4
+Public fan0
+Units temp0=deg C
+Units mntemptoday=deg C
+Units mxtemptoday=deg C
+Units tmntemp=24-hr-time
+Units tmxtemp=24-hr-time
+Units fan0=Hz
+
+' MetOne 060A2 Air Temp Sensor (Level 1)
+Public temp1
+Public fan1 
+Units temp1=deg C
+Units fan1=Hz
+
+' MetOne 060A2 Air Temp Sensor (Level 2)
+Public temp2
+Public fan2 
+Units temp2=deg C
+Units fan2=Hz
+
+' MetOne 060A2 Air Temp Sensor (Level 3)
+Public temp3
+Public fan3 
+Units temp3=deg C
+Units fan3=Hz
+
+' Rotronics MP101A Air Temp & RH Sensor (Level 0)
+Public rh
+Public avgrh,mxrh,mnrh
+Units rh=%
+Units avgrh=%
+Units mxrh=%
+Units mnrh=%
+Public dewp
+Public avgdewp,mxdewp,mndewp
+Units dewp=deg C
+Units avgdewp=deg C
+Units mxdewp=deg C
+Units mndewp=deg C
+
+'All Weather Tipping Bucket Rain Gauge
+Public precip
+Units precip=in
+
+' Eppley PSP1 Precision Spectral Pyranometer
+Public swdn_measure, swdn_Wm2, swdn_MJm2
+Units swdn_measure=uV
+Units swdn_Wm2=W/m^2
+Units swdn_MJm2=MJ/m^2
+
+Const PSP1Cal=8.69  ' Enter PSP1Cal = Eppley Sensitivity Cal Constant in microVolt/WM^2 for this tower
+
+' ====================
+' Data Tables.
+' ====================
+
+DataTable(Dat1min,True,48)  '*Note: data table size fixed to 48 records
+  DataInterval(0,1,Min,10)
+  ' This table is used to compute speed, direction and time of max sustained
+  '    1min gust.
+
+  ' RM Young 05305-AQ Horizontal Wind Speed & Direction Sensor (Level 1)
+  WindVector (1,spd1,dir1,FP2,False,0,0,1)  
+  FieldNames("spd1min,dir1min")
+EndTable
+
+DataTable(Dat15min,True,-1)
+  DataInterval(0,15,Min,10)
+
+  ' RM Young 05305-AQ Horizontal Wind Speed & Direction Sensor (Level 1)
+  WindVector (1,spd1,dir1,FP2,False,0,0,1)  
+  FieldNames("spd1,dir1")
+  StdDev (1,spd1,FP2,False)
+  FieldNames("sdspd1")
+  StdDev (1,dir1,FP2,False)
+  FieldNames("sddir1")
+  Sample(1, mxgsttoday, FP2)
+
+  ' RM Young 05305-AQ Horizontal Wind Speed & Direction Sensor (Level 2)
+  WindVector (1,spd2,dir2,FP2,False,0,0,1)  
+  FieldNames("spd2,dir2")
+  StdDev (1,spd2,FP2,False)
+  FieldNames("sdspd2")
+  StdDev (1,dir2,FP2,False)
+  FieldNames("sddir2")
+
+  ' RM Young 05305-AQ Horizontal Wind Speed & Direction Sensor (Level 3)
+  WindVector (1,spd3,dir3,FP2,False,0,0,1)  
+  FieldNames("spd3,dir3")
+  StdDev (1,spd3,FP2,False)
+  FieldNames("sdspd3")
+  StdDev (1,dir3,FP2,False)
+  FieldNames("sddir3")
+
+  ' RM Young 27106T Vertical Wind Speed Sensor (Level 1)
+  Average(1,w1,FP2,False)  
+  FieldNames("w1")
+  StdDev(1,w1,FP2,False)  
+  FieldNames("sdw1")
+
+  '  MetOne 060A2 Air Temp Sensor(Level 0)
+  Average(1,temp0,FP2,False)
+  FieldNames("temp0")
+  Sample(1, mntemptoday, FP2)
+  Sample(1, mxtemptoday, FP2)
+
+  ' Rotronics MP101A Air Temp & RH Sensor (Level 0)
+  Average(1,rh,FP2,False)
+  FieldNames("rh")
+
+  'All Weather Tipping Bucket Rain Gauge
+  Totalize(1,precip,FP2,False)  
+
+  ' Eppley PSP1 Precision Spectral Pyranometer
+  Average(1,swdn_Wm2,IEEE4,False)  'Average solar irradiance
+EndTable
+
+DataTable(Dat24hr,True,-1)
+  DataInterval(0,24,Hr,10)
+
+  ' RM Young 05305-AQ Horizontal Wind Speed & Direction Sensor (Level 1)
+  Average(1,spd1,FP2,False)  
+  Fieldnames("avgspd1")
+  Sample (1,mxgst1,FP2)  
+  Sample (1,dirgst1,FP2)  
+  Sample(1,tgst1,String)
+  Sample (1,mx1gst,FP2)  
+  Sample (1,dir1gst,FP2)  
+  Sample(1,t1gst,String)
+
+  ' RM Young 05305-AQ Horizontal Wind Speed & Direction Sensor (Level 2)
+  Average(1,spd2,FP2,False)  
+  Fieldnames("avgspd2")
+  Sample (1,mxgst2,FP2)  
+  Sample (1,dirgst2,FP2)  
+  Sample(1,tgst2,String)
+
+  ' RM Young 05305-AQ Horizontal Wind Speed & Direction Sensor (Level 3)
+  Average(1,spd3,FP2,False)  
+  Fieldnames("avgspd3")
+  Sample (1,mxgst3,FP2)  
+  Sample (1,dirgst3,FP2)  
+  Sample(1,tgst3,String)
+
+  '  MetOne 060A2 Air Temp Sensor(1)
+  Average(1,temp0,FP2,False)  
+  Fieldnames("avgtemp0")
+  Maximum(1,temp0,FP2,False,False) 
+  FieldNames("mxtemp0")
+  Sample(1, tmxtemp, String)
+  Minimum(1,temp0,FP2,False,False) 
+  FieldNames("mntemp0")
+  Sample(1, tmntemp, String)
+
+  ' Rotronics MP101A Air Temp & RH Sensor (Level 0)
+  Average(1,rh,FP2,False)  
+  Fieldnames("avgrh")
+  Maximum(1,rh,FP2,False,False) 
+  FieldNames("mxrh")
+  Minimum(1,rh,FP2,False,False) 
+  FieldNames("mnrh")
+
+  'All Weather Tipping Bucket Rain Gauge
+  Totalize(1,precip,FP2,False)  
+  Fieldnames("tprecip")
+
+  ' Eppley PSP1 Precision Spectral Pyranometer
+  Totalize(1,swdn_MJm2,IEEE4,False)  'Total flux density
+  FieldNames("swedn")
+EndTable
+
+DataTable(OpsMonitor,True,-1)
+  DataInterval(0,15,Min,0)
+
+  ' Battery
+  Average(1,BattV,FP2,False)
+  Average(1,PTemp_C,FP2,False)
+  FieldNames("PTemp_AVGDegC")
+  Average(1,PVVolts,FP2,False)
+
+  ' MetOne 060A2 Air Temp Sensor(Level 0)
+  Average (1,fan0,FP2,False) 
+EndTable
+
+' ====================
+' Subroutines.
+' ====================
+
+' ====================
+' Main Program.        
+' ====================
+BeginProg
+
+' ====================
+' Main Loop.        
+' ====================
+  Scan(3,Sec,1,0)
+
+    ' Battery
+    ' Datalogger Battery Voltage measurement 'BattV'
+    Battery(BattV)
+    ' Datalogger Wiring Panel Temperature measurement 'PTemp_C'
+    PanelTemp(PTemp_C,_60Hz)
+    ' Monitor exactly how high the sun voltage is being provided by the Solar Panels throughout the day.
+    VoltDiff(PVVolts,1,mV5000,d_pvvolts,True,500,60,0.01,0)
+
+    ' RM Young 05305-AQ Wind Speed & Direction Sensor (Level 1)
+    ' Measure instantaneous wind speed and direction.
+    PulseCount(spd1,1,p_wind_horiz_lev1,5,1,0.1024,0)
+    BrHalf(dir1,1,mV1000,se_wind_horiz_lev1,ex_wind_horiz_lev1,1,1000,True,0,_60Hz,355,0)
+    If dir1>=360 OR dir1<0 Then dir1=0
+
+    ' Keep track of the speed, direction and time of the maximium 3 sec gust.
+    If spd1 > mxgst1 Then
+      mxgst1 = spd1
+      dirgst1 = dir1
+      mxgsttoday = mxgst1
+      RealTime (HW1Max24HrTime())
+      hh = HW1Max24HrTime(4)
+      mm = HW1Max24HrTime(5)
+      'Sprintf(tgst1, "%02d%02d",INT(hh),INT(mm))
+      If hh >= 10 AND mm >= 10 Then
+        tgst1 = "" + hh + mm
+      ElseIf hh >= 10 AND mm < 10 Then
+        tgst1 = "" + hh + "0" + mm
+      ElseIf hh < 10 AND mm >= 10 Then
+        tgst1 = "0" + hh + mm
+      ElseIf hh < 10 AND mm < 10 Then
+        tgst1 = "0" + hh + "0" + mm
+      EndIf
+    EndIf
+
+    ' Keep track of the speed, direction and time of the maximium 1 min gust.
+    If Dat1min.spd1min > mx1gst Then
+      mx1gst = Dat1min.spd1min
+      dir1gst = Dat1min.dir1min
+      RealTime (HWTime1_1min())
+      hh = HWTime1_1min(4)
+      mm = HWTime1_1min(5)
+      'Sprintf(t1gst, "%02d%02d",INT(hh),INT(mm))
+      If hh >= 10 AND mm >= 10 Then
+        t1gst = "" + hh + mm
+      ElseIf hh >= 10 AND mm < 10 Then
+        t1gst = "" + hh + "0" + mm
+      ElseIf hh < 10 AND mm >= 10 Then
+        t1gst = "0" + hh + mm
+      ElseIf hh < 10 AND mm < 10 Then
+        t1gst = "0" + hh + "0" + mm
+      EndIf
+    EndIf
+
+    ' RM Young 05305-AQ Wind Speed & Direction Sensor (Level 2)
+    ' Measure instantaneous wind speed and direction.
+    PulseCount(spd2,1,p_wind_horiz_lev2,5,1,0.1024,0)
+    ' ktw: Check on RevEx and Settling time arguments.
+    BrHalf(dir2,1,mV1000,se_wind_horiz_lev2,ex_wind_horiz_lev2,1,1000,False,20000,_60Hz,355,0)
+    If dir2>=360 OR dir2<0 Then dir2=0
+
+    ' Keep track of the speed, direction and time of the maximium 3 sec gust.
+    If spd2 > mxgst2 Then
+      mxgst2 = spd2
+      dirgst2 = dir2
+      RealTime (HW2Max24HrTime())
+      hh = HW2Max24HrTime(4)
+      mm = HW2Max24HrTime(5)
+      'Sprintf(tgst2, "%02d%02d",INT(hh),INT(mm))
+      If hh >= 10 AND mm >= 10 Then
+        tgst2 = "" + hh + mm
+      ElseIf hh >= 10 AND mm < 10 Then
+        tgst2 = "" + hh + "0" + mm
+      ElseIf hh < 10 AND mm >= 10 Then
+        tgst2 = "0" + hh + mm
+      ElseIf hh < 10 AND mm < 10 Then
+        tgst2 = "0" + hh + "0" + mm
+      EndIf
+    EndIf
+
+
+    ' RM Young 05305-AQ Wind Speed & Direction Sensor (Level 3)
+    ' Measure instantaneous wind speed and direction.
+    PulseCount(spd3,1,p_wind_horiz_lev3,5,1,0.1024,0)
+    ' ktw: Check on RevEx and Settling time arguments.
+    BrHalf(dir3,1,mV1000,se_wind_horiz_lev3,ex_wind_horiz_lev3,1,1000,False,20000,_60Hz,355,0)
+    If dir3>=360 OR dir3<0 Then dir3=0
+
+    ' Keep track of the speed, direction and time of the maximium 3 sec gust.
+    If spd3 > mxgst3 Then
+      mxgst3 = spd3
+      dirgst3 = dir3
+      RealTime (HW3Max24HrTime())
+      hh = HW3Max24HrTime(4)
+      mm = HW3Max24HrTime(5)
+      'Sprintf(tgst3, "%02d%02d",INT(hh),INT(mm))
+      If hh >= 10 AND mm >= 10 Then
+        tgst3 = "" + hh + mm
+      ElseIf hh >= 10 AND mm < 10 Then
+        tgst3 = "" + hh + "0" + mm
+      ElseIf hh < 10 AND mm >= 10 Then
+        tgst3 = "0" + hh + mm
+      ElseIf hh < 10 AND mm < 10 Then
+        tgst3 = "0" + hh + "0" + mm
+      EndIf
+    EndIf
+
+
+    '  RM Young 27106T Wind Speed Sensor (Level 1)
+    '  Wind Speed Sensor measurements 'w1'
+    VoltSe(w1,1,mV5000,se_wind_vert_lev1,True,0,_60Hz,0.0225,0)
+
+    '  RM Young 27106T Wind Speed Sensor (Level 2)
+    '  Wind Speed Sensor measurements 'w2'
+    VoltSe(w2,1,mV5000,se_wind_vert_lev2,True,0,_60Hz,0.0225,0)
+
+    '  RM Young 27106T Wind Speed Sensor (Level 3)
+    '  Wind Speed Sensor measurements 'w3'
+    VoltSe(w3,1,mV5000,se_wind_vert_lev3,True,0,_60Hz,0.0225,0)
+
+    ' MetOne 060A2 Air Temp Sensor (Level 0)
+    BrHalf(temp0,1,mV1000,se_temp_metone_lev0,2,1,1000,False,0,_60Hz,-147.0588,95.7353)
+    ' Measure the fan speed in Hz
+    PulseCount (fan0,1,p_fan_lev0,3,1,1.0,0)
+    
+    ' Keep track of daily min/max.
+    If temp0 < mntemptoday Then
+      mntemptoday = temp0
+      RealTime (MinTime())
+      hh = MinTime(4)
+      mm = MinTime(5)
+      'Sprintf(tmntemp, "%02d%02d",hh,mm)
+      If hh >= 10 AND mm >= 10 Then
+        tmntemp = "" + hh + mm
+      ElseIf hh >= 10 AND mm < 10 Then
+        tmntemp = "" + hh + "0" + mm
+      ElseIf hh < 10 AND mm >= 10 Then
+        tmntemp = "0" + hh + mm
+      ElseIf hh < 10 AND mm < 10 Then
+        tmntemp = "0" + hh + "0" + mm
+      EndIf
+    EndIf
+    If temp0 > mxtemptoday Then
+      mxtemptoday = temp0
+      RealTime (MaxTime())
+      hh = MaxTime(4)
+      mm = MaxTime(5)
+      'Sprintf(tmxtemp, "%02d%02d",INT(hh),INT(mm))
+      If hh >= 10 AND mm >= 10 Then
+        tmxtemp = "" + hh + mm
+      ElseIf hh >= 10 AND mm < 10 Then
+        tmxtemp = "" + hh + "0" + mm
+      ElseIf hh < 10 AND mm >= 10 Then
+        tmxtemp = "0" + hh + mm
+      ElseIf hh < 10 AND mm < 10 Then
+        tmxtemp = "0" + hh + "0" + mm
+      EndIf
+    EndIf
+
+    ' MetOne 060A2 Air Temp Sensor (Level 1)
+    BrHalf(temp1,1,mV1000,se_temp_metone_lev1,2,1,1000,False,0,_60Hz,-147.0588,95.7353)
+    ' Measure the fan speed in Hz
+    PulseCount (fan1,1,p_fan_lev1,3,1,1.0,0)
+
+    ' MetOne 060A2 Air Temp Sensor (Level 2)
+    BrHalf(temp2,1,mV1000,se_temp_metone_lev2,2,1,1000,False,0,_60Hz,-147.0588,95.7353)
+    ' Measure the fan speed in Hz
+    PulseCount (fan2,1,p_fan_lev2,3,1,1.0,0)
+
+    ' MetOne 060A2 Air Temp Sensor (Level 3)
+    BrHalf(temp3,1,mV1000,se_temp_metone_lev3,2,1,1000,False,0,_60Hz,-147.0588,95.7353)
+    ' Measure the fan speed in Hz
+    PulseCount (fan3,1,p_fan_lev3,3,1,1.0,0)
+
+    ' Rotronics MP101A Air Temp & RH Sensor (Level 0)
+    VoltSe(rh,1,mV1000,se_rh_rotronics_lev0,0,0,_60Hz,0.1,0)
+    if rh < 0.0 then rh = 0.0
+    if rh > 100.0 then rh = 100.0
+    ' Convert relative humidity to dew point.
+    DewPoint(dewp,temp0,rh)
+    If dewp>temp0 OR dewp=NAN Then dewp=temp0
+
+    'All Weather Tipping Bucket Rain Gauge
+    PulseCount(precip,1,p_precip,1,0,0.01,0)	
+    'Change suggested by Alex, original Pconfig for "control ports only", 
+    '   suggested use of pull up on pulse channels. From CRBasic help manual:
+    'PulseCount ( Dest, Reps, PChan, PConfig, POption, Mult, Offset )
+	'PConfig options:
+	'Code 	Description
+	'0 	Disabled
+	'1 	Switch Closure with pull up
+	'2 	Switch Closure with pull down (Control ports only)
+	'3 	High frequency with pull up
+	'4 	High frequency with pull down (Control ports only)
+	'5 	Low Level AC (Pulse channels only)
+
+    ' Eppley PSP1 Precision Spectral Pyranometer
+    VoltDiff(swdn_measure,1,mV20,d_swdn,True,0,_60Hz,1000,0)
+    swdn_Wm2=swdn_measure/PSP1Cal  'in W/m2
+    swdn_MJm2=(swdn_Wm2/1000000)*PScan  'in MJ/m2
+
+' =================
+' Table calls
+' =================
+
+    CallTable dat1min
+    CallTable dat15min
+    CallTable dat24hr
+    CallTable opsMonitor
+
+    If TimeIntoInterval (0,1,Day) Then
+      ' Max 3 sec gusts.
+      mxgst1 = 0
+      dirgst1 = 0
+      mxgsttoday = 0
+
+      ' Max 1 min gusts.
+      mx1gst = 0
+      dir1gst = 0
+    EndIf
+    If TimeIntoInterval (0,1,Day) Then
+      ' Max 3 sec gusts.
+      mxgst2 = 0
+      dirgst2 = 0
+    EndIf
+    If TimeIntoInterval (0,1,Day) Then
+      ' Max 3 sec gusts.
+      mxgst3 = 0
+      dirgst3 = 0
+    EndIf
+    If TimeIntoInterval (0,1,Day) Then
+      ' Reset variables at the beginning of a new day. 
+      mntemptoday = 99
+      mxtemptoday = -99
+    EndIf
+  NextScan
+
+  If TimeIntoInterval (0,1,Day) Then
+    HWSpd2Max24Hr=0
+    HWDir2Max24Hr=0
+    HW2Max24HrTime(4)=0  'hour
+    HW2Max24HrTime(5)=0  'minute
+  EndIf
+
+EndProg
