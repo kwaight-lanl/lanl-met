@@ -36,7 +36,8 @@ wbgtData2 = pd.read_csv(tower2wbgtFile1, parse_dates=True)
 wbgtCurrent2 = wbgtData1.tail(2)
 
 # Extract the desired current data for the WBGT webpage.
-title = 'Wet Bulb Globe Temperatures (WBGT), most recent 15 minute observations'
+#title = 'Wet Bulb Globe Temperatures (WBGT), most recent 15 minute observations'
+title = 'Wet Bulb Globe Temperatures (WBGT), most recent 15 minute observations [NOT UPDATED DURING THE COOL SEASON]'
 # TA6
 time1 = wbgtCurrent1['dts'].values[0]
 # Reformat time.
@@ -84,7 +85,7 @@ with doc.head:
     script(type='text/javascript', src='script.js')
 
 with doc:
-    print(html(body(h3('Wet Bulb Globe Temperature (WBGT), Most Recent 15 min Observations'))))
+    print(html(body(h3(title))))
     print(html(body(h4(wbgt1))))
     list = ul()
     list += li('\n' + timestring1)
