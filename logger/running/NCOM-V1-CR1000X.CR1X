@@ -1,0 +1,103 @@
+'
+'
+'Progam Title:  NCOM-V1-CR1000X.CR1X
+'
+'CR1000X Series Datalogger
+'###################################################################################
+'########## Program Comments #######################################################
+'###################################################################################
+' Program & new datalogger at new station deployed on Feb 25, 2025 by gts & meteorologists'
+'
+'
+'Date:  12 Dec. 2024
+' New Program Converted from CR3 to CR1X, gts.
+' Maintaining identical Station Name "NCOM"
+' Data tracking between stations will be differenciated by the Start Date of the new hardware & data collections.
+' Old Data/Previous Station was a Arkansas Street Civil Defense Building.
+'
+'
+' Date: July 30, 2014
+' New Program: NCOM_V1.CR3
+' Old Program: TA6_Combined-SCW.CR3
+' Comments:
+'^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+'*Install Note: Setup & test communication and sensor measurements in
+' lab/office prior to field deployment!
+'^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+'---------------------------------
+' Date: July 11, 2014
+' Program: TA6_Combined-SCW.CR3
+' Comments: Started-Created by Short Cut (3.0)
+'---------------------------------------------
+'***********************************************************************************
+'
+'###################################################################################
+'##### -Wiring for CR1000x- #########################################################
+'###################################################################################
+'  All Weather Rain Gauge wired to a control port
+'    Ground:  Cable Shield Clear?
+'    P4:  Signal+ Red
+'     G:  Signal- Black
+'
+'###################################################################################
+'##### Declare Variables ###########################################################
+'###################################################################################
+SequentialMode
+Public BattV, PTemp_C, Rain_inch
+'
+'###################################################################################
+'##### Declare Units ###############################################################
+'###################################################################################
+Units Rain_inch=inch
+'
+'###################################################################################
+'##### Define Data Tables ##########################################################
+'###################################################################################
+'-----------------------------------------------------------------------------------
+'----- Data Table: "Dat15min" , Interval: 15minutes --------------------------------
+'-----------------------------------------------------------------------------------
+DataTable(Dat15min,True,-1)
+  DataInterval(0,15,Min,10)
+  Totalize(1,Rain_inch,FP2,False)  'Total AW60103 rain
+  FieldNames("Rain_TOTinch")
+  '-------------------------------------------------------------
+  Minimum(1,BattV,FP2,False,False)  'Min Battery Voltage
+  FieldNames("BattV_MINVolt")
+  Average(1,PTemp_C,FP2,False)  'Avg datalogger panel temperature
+  FieldNames("PTemp_AVGDegC")
+  '-------------------------------------------------------------
+EndTable
+'
+'-----------------------------------------------------------------------------------
+'----- Data Table: "Dat24Hr" , Interval: 24Hr --------------------------------------
+'-----------------------------------------------------------------------------------
+DataTable(Dat24Hr,True,-1)
+  DataInterval(0,1440,Min,10)
+  Totalize(1,Rain_inch,FP2,False)  'Total AW60103 rain
+  FieldNames("Rain_TOTinch")
+EndTable
+'
+'###################################################################################
+'##### Main Program ################################################################
+'###################################################################################
+'Main Scan -----------------------------------------------------------------------
+BeginProg
+  Scan (1,Sec,0,0)
+    '---------------------------------------------------------------------
+    ' Datalogger Battery Voltage measurement 'BattV'
+    Battery(BattV)
+    ' Datalogger Wiring Panel Temperature measurement 'PTemp_C'
+    PanelTemp(PTemp_C,_60Hz)
+    '-------------------------------------------------------------------------
+    'All Weather Rain Gauge wired to a control port, measurement 'Rain_inch'
+    PulseCount(Rain_inch,1,P1,1,0,0.01,0)
+    '
+    '---------------------------------
+    'Call Data Tables and Store Data
+    '---------------------------------
+    CallTable(Dat15min)
+    CallTable(Dat24Hr)
+  NextScan
+EndProg
+
+
