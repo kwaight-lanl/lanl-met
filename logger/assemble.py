@@ -190,6 +190,7 @@ with open(codeFile, 'w') as codeOut:
                        '\'--------------\n')
             codeOut.write('\n')    
             codeOut.write(comment)
+        codeOut.write('\n')    
         codeOut.write('SequentialMode\n')
     elif pipeline:
         print('Pipeline mode')
