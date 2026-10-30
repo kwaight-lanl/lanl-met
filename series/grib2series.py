@@ -76,7 +76,7 @@ for site in sites:
         if uvOrWspdWdir == 'uv':
             csvOut.write('n,time,u(m/s),v(m/s)\n')
         else:
-            csvOut.write('n,timeUtc,hrMst,dir1(deg),dir1 obs,spd1(m/s),spd1 obs\n')
+            csvOut.write('n,timeUtc,hrMst,HRRR dir1,obs dir1,HRRR spd1(m/s),obs spd1\n')
         # Go through grib2 files.
         gribfiles = sorted(glob.glob('*.grib2'))
         #print('gribfiles:', gribfiles)
