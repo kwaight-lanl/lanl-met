@@ -1,4 +1,4 @@
-' Built with assemble.py: 2026-10-01 10:10
+' Built with assemble.py: 2026-11-12 14:19
 ' assemble.py -tables dat1min dat15min dat24hr opsMonitor -parts cr1000x wind-horiz-1 wind-horiz-2 wind-horiz-3 wind-horiz-4 wind-vert-1 wind-vert-2 wind-vert-3 wind-vert-4 temp-metone-0 temp-metone-1 temp-metone-2 temp-metone-3 temp-metone-4 rh-rotronics-0 precip swdn swup lwdn lwup netrad fm1hr fm10hr fm100-1000hr pressure snow-laser TA6 -o ta6.cr1x
 
 
@@ -246,7 +246,7 @@ Const ex_temp_metone_lev0 = 1
 Const p_fan_lev0 = 1
 
 ' Rotronics MP101A Air Temp & RH Sensor (Level 0)
-se_rh_rotronics_lev0 = 15
+Const se_rh_rotronics_lev0 = 15
 
 ' MetOne 060A2 Air Temp Sensor (Level 1)
 Const se_temp_metone_lev1 = 1
@@ -284,9 +284,16 @@ Const LWDNCal=2.00  ' Enter LWDNCal(LWDN) = Eppley Sensitivity Cal Constant in m
 Const d_lwup = 1
 Const LWUPCal=3.87  ' Enter LWUPCal(LWUP) = Eppley Sensitivity Cal Constant in microVolt/WM^2 (LWUP/PIR-2)
 
+'All Weather Tipping Bucket Rain Gauge
+Const p_precip = P2 'Rain Gauge P2 Channel
+
 'SDMS40 Laser Snow Sensor
 Const sdi_snow = 1
 
+' Campbell Scientific Fuel Moisture Station Package (CS506 & 107L)
+Const c_fm10hr_portset = C5 ' CS506 Module Enable Power For Cntrl Port C5
+Const se_fm10hr_moisture = 10 ' CS506 Fuel Moist. Calc. Signal SE10 Channel
+Const se_fm10hr_temp = 9 ' 107L Therm-Temp Signal SE9 Channel
 
 
 ' ====================
@@ -503,8 +510,6 @@ Public snowd
 Public snowdMidnight
 Units snowd = in
 Units snowdMidnight = in
-
-Const PSP1Cal=10.49  ' Enter PSP1Cal = Eppley Sensitivity Cal Constant in microVolt/WM^2 for this tower
 
 ' ====================
 ' Data Tables.
@@ -735,7 +740,7 @@ DataTable(Dat24hr,True,-1)
 EndTable
 
 DataTable(OpsMonitor,True,-1)
-  DataInterval(0,15,Min,0)
+  DataInterval(0,15,Min,10)
 
   ' MetOne 060A2 Air Temp Sensor(Level 0)
   Average (1,fan0,FP2,False) 

@@ -1,4 +1,4 @@
-' Built with assemble.py: 2026-09-30 15:37
+' Built with assemble.py: 2026-11-12 13:54
 ' assemble.py -tables dat1min dat15min dat24hr opsMonitor -parts cr1000x wind-horiz-1 wind-horiz-2 wind-horiz-3 wind-vert-1 wind-vert-2 wind-vert-3 temp-metone-0 temp-metone-1 temp-metone-2 temp-metone-3 rh-rotronics-0 precip swdn fm1hr fm10hr fm100-1000hr TA49 -o ta49.cr1x
 
 
@@ -146,7 +146,7 @@ Const ex_temp_metone_lev0 = 1
 Const p_fan_lev0 = 1
 
 ' Rotronics MP101A Air Temp & RH Sensor (Level 0)
-se_rh_rotronics_lev0 = 15
+Const se_rh_rotronics_lev0 = 15
 
 ' MetOne 060A2 Air Temp Sensor (Level 1)
 Const se_temp_metone_lev1 = 1
@@ -163,6 +163,17 @@ Const se_temp_metone_lev3 = 1
 Const ex_temp_metone_lev3 = 1
 Const p_fan_lev3 = 1
 
+'Eppley PSP1 Precision Spectral Pyranometer
+Const PSP1Cal=9.51 'PSP1Cal=Sensitivity Cal Constant in microVolt/WM^2
+Const d_swdn = 5 ' Downward Shortwave Differential Channel
+
+'All Weather Tipping Bucket Rain Gauge
+Const p_precip = P2 'Rain Gauge P2 Channel
+
+' Campbell Scientific Fuel Moisture Station Package (CS506 & 107L)
+Const c_fm10hr_portset = C5 ' CS506 Module Enable Power For Cntrl Port C5
+Const se_fm10hr_moisture = 10 ' CS506 Fuel Moist. Calc. Signal SE10 Channel
+Const se_fm10hr_temp = 9 ' 107L Therm-Temp Signal SE9 Channel
 
 
 ' ====================
@@ -320,8 +331,6 @@ Units fm100hr=%
 Units fm1000hr=%
 
 
-
-Const PSP1Cal=8.27  ' Enter PSP1Cal = Eppley Sensitivity Cal Constant in microVolt/WM^2 for this tower
 
 ' ====================
 ' Data Tables.
@@ -481,7 +490,7 @@ DataTable(Dat24hr,True,-1)
 EndTable
 
 DataTable(OpsMonitor,True,-1)
-  DataInterval(0,15,Min,0)
+  DataInterval(0,15,Min,10)
 
   ' MetOne 060A2 Air Temp Sensor(Level 0)
   Average (1,fan0,FP2,False) 

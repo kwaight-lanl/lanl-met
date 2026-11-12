@@ -1,4 +1,4 @@
-' Built with assemble.py: 2026-09-17 09:33
+' Built with assemble.py: 2026-11-12 13:51
 ' assemble.py -tables dat1min dat15min dat24hr opsMonitor -parts battery cr1000x wind-horiz-1 wind-vert-1 temp-rh-41382-0 temp-rh-41382-1 swdn TA5 -o ta5.cr1x
 
 ' Data Logger Program for 10 meter meteorological tower TA5, located at TA5.
@@ -52,7 +52,7 @@
 ' RM Young 27106T Vertical Wind Speed Sensor (Level 1)
 ' RM Young 41382VC Air Temp and RH (Level 0)
 ' RM Young 41382VC Air Temp and RH (Level 1)
-' Eppley PSP1 Precision Spectral Pyranometer 
+' Eppley Precision Spectral Pyranometer *Note: Facing up (swdn)
 
 
 ' ====================
@@ -155,13 +155,11 @@ Units rh1=%
 Units dewp1=deg C
 Units fan1=Hz
 
-' Eppley PSP1 Precision Spectral Pyranometer
-Public swdn_measure, swdn_Wm2, swdn_MJm2
+' Eppley Precision Spectral Pyranometer *Note: Facing up (swdn)
+Public swdn_measure, swdn, swdn_MJm2
 Units swdn_measure=uV
-Units swdn_Wm2=W/m^2
+Units swdn=W/m^2
 Units swdn_MJm2=MJ/m^2
-
-Const PSP1Cal=9.73  ' Enter PSP1Cal = Eppley Sensitivity Cal Constant in microVolt/WM^2 for this tower
 
 ' ====================
 ' Data Tables.
@@ -213,8 +211,8 @@ DataTable(Dat15min,True,-1)
   Average(1,dewp1,FP2,False)  
   FieldNames("dewp1")
 
-  ' Eppley PSP1 Precision Spectral Pyranometer
-  Average(1,swdn_Wm2,IEEE4,False)  'Average solar irradiance
+  ' Eppley Precision Spectral Pyranometer *Note: Facing down (swdn)
+  Average(1,swdn,IEEE4,False)  'Average solar irradiance
 EndTable
 
 DataTable(Dat24hr,True,-1)
@@ -252,13 +250,13 @@ DataTable(Dat24hr,True,-1)
   Minimum(1,dewp0,FP2,False,False)  
   Fieldnames("mndewp0")
 
-  ' Eppley PSP1 Precision Spectral Pyranometer
+  ' Eppley Precision Spectral Pyranometer *Note: Facing down (swdn)
   Totalize(1,swdn_MJm2,IEEE4,False)  'Total flux density
   FieldNames("swedn")
 EndTable
 
 DataTable(OpsMonitor,True,-1)
-  DataInterval(0,15,Min,0)
+  DataInterval(0,15,Min,10)
 
   ' Battery
   Average(1,BattV,FP2,False)
@@ -394,10 +392,10 @@ BeginProg
     ' Measure the fan speed in Hz
     PulseCount (fan1,1,p_fan_lev1,3,1,1.0,0)
 
-    ' Eppley PSP1 Precision Spectral Pyranometer
+    ' Eppley Precision Spectral Pyranometer *Note: Facing down (swdn)
     VoltDiff(swdn_measure,1,mV20,d_swdn,True,0,_60Hz,1000,0)
-    swdn_Wm2=swdn_measure/PSP1Cal  'in W/m2
-    swdn_MJm2=(swdn_Wm2/1000000)*PScan  'in MJ/m2
+    swdn=swdn_measure/SWDNCal  'in W/m2
+    swdn_MJm2=(swdn/1000000)*PScan  'in MJ/m2
 
 ' =================
 ' Table calls

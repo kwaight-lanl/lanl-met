@@ -1,5 +1,5 @@
-' Built with assemble.py: 2026-09-30 15:37
-' assemble.py -tables dat1min dat15min dat24hr opsMonitor -parts cr1000x wind-horiz-1 wind-horiz-2 wind-horiz-3 wind-vert-1 wind-vert-2 wind-vert-3 temp-metone-0 temp-metone-1 temp-metone-2 temp-metone-3 rh-rotronics-0 precip swdn swup lwdn lwup netrad fm1hr fm10hr pressure TA54 -o ta54.cr1x
+' Built with assemble.py: 2026-11-12 13:54
+' assemble.py -tables dat1min dat15min dat24hr opsMonitor -parts cr1000x wind-horiz-1 wind-horiz-2 wind-horiz-3 wind-vert-1 wind-vert-2 wind-vert-3 temp-metone-0 temp-metone-1 temp-metone-2 temp-metone-3 rh-rotronics-0 precip swdn swup lwdn lwup netrad fm10hr pressure TA54 -o ta54.cr1x
 
 
 ' =============================
@@ -153,7 +153,6 @@
 ' Eppley Precision Infrared Radiometer *Note: Facing up (lwdn)
 ' Eppley Precision Infrared Radiometer *Note: Facing down (lwup)
 ' Net radiation (W/m2)
-' Campbell Scientific 1-Hour Fuel Moisture
 ' Campbell Scientific Fuel Moisture and Temperature Station (CS506 & 107L)
 ' Campbell Scientific 10-Hour Fuel Moisture
 ' CS100 Barometric Pressure Sensor 
@@ -194,7 +193,7 @@ Const ex_temp_metone_lev0 = 1
 Const p_fan_lev0 = 1
 
 ' Rotronics MP101A Air Temp & RH Sensor (Level 0)
-se_rh_rotronics_lev0 = 15
+Const se_rh_rotronics_lev0 = 15
 
 ' MetOne 060A2 Air Temp Sensor (Level 1)
 Const se_temp_metone_lev1 = 1
@@ -226,6 +225,14 @@ Const LWDNCal=2.00  ' Enter LWDNCal(LWDN) = Eppley Sensitivity Cal Constant in m
 ' Eppley Precision Infrared Radiometer *Note: Facing UP (lwup)
 Const d_lwup = 1
 Const LWUPCal=3.87  ' Enter LWUPCal(LWUP) = Eppley Sensitivity Cal Constant in microVolt/WM^2 (LWUP/PIR-2)
+
+'All Weather Tipping Bucket Rain Gauge
+Const p_precip = P2 'Rain Gauge P2 Channel
+
+' Campbell Scientific Fuel Moisture Station Package (CS506 & 107L)
+Const c_fm10hr_portset = C5 ' CS506 Module Enable Power For Cntrl Port C5
+Const se_fm10hr_moisture = 10 ' CS506 Fuel Moist. Calc. Signal SE10 Channel
+Const se_fm10hr_temp = 9 ' 107L Therm-Temp Signal SE9 Channel
 
 
 ' ====================
@@ -370,13 +377,6 @@ Units lwup_MJm2=MJ/m^2
 Public netrad
 Units netrad=W/m^2
 
-' Campbell Scientific 1-Hour Fuel Moisture
-Public temp0f
-Public EMC, fm1hr
-Public i
-Units fm1hr=%
-Units temp0f=deg
-
 ' Campbell Scientific Fuel Moisture Station Package (CS506 & 107L)
 ' Campbell Scientific 10-Hour Fuel Moisture
 Public FuelM10Hr_uS
@@ -393,8 +393,6 @@ Units press=mb
 Units avgpress=mb
 Units mxpress=mb
 Units mnpress=mb
-
-Const PSP1Cal=9.58  ' Enter PSP1Cal = Eppley Sensitivity Cal Constant in microVolt/WM^2 for this tower
 
 ' ====================
 ' Data Tables.
@@ -496,9 +494,6 @@ DataTable(Dat15min,True,-1)
   ' Net radiation (W/m2)
   Average(1,netrad,IEEE4,False)  'Average net radiation
 
-  ' Campbell Scientific 1-Hour Fuel Moisture
-  Average (1,fm1hr,FP2,False)
-
   ' Campbell Scientific Fuel Moisture Station Package (CS506 & 107L)
   ' Campbell Scientific 10-Hour Fuel Moisture
   Average (1,fm10hr,FP2,False)
@@ -590,7 +585,7 @@ DataTable(Dat24hr,True,-1)
 EndTable
 
 DataTable(OpsMonitor,True,-1)
-  DataInterval(0,15,Min,0)
+  DataInterval(0,15,Min,10)
 
   ' MetOne 060A2 Air Temp Sensor(Level 0)
   Average (1,fan0,FP2,False) 
@@ -819,28 +814,6 @@ BeginProg
 
     ' Net radiation (W/m2)
     netrad = (swdn + lwdn) - (swup +lwup)
-
-' Campbell Scientific 1-Hour Fuel Moisture
-    ' Source of previous calculation of EMC and 1 hr fuel moisture is unknown, so
-    '   switched to calculations from Cohen and Deeming reference instead. 
-    '   The differences in 1 hr fuel moisture were found to be small.
-    ' December 2021 - Ken Waight
-
-    ' New calculation of EMC and 1 hr fuel moisture.
-    ' Cohen, J.D. and J.E. Deeming, 1982?: The National Fire Danger Rating System: basic equations. 
-    '   General Technical Report PSW-82, U.S. Forest Service, Pacific Southwest Forest and Range
-    '   Experimental Station.
-    ' December 2021 - Ken Waight
-    temp0f = (1.8*temp0)+32
-    If rh0 < 10 Then
-      EMC = 0.03229 + 0.281073*rh0 - 0.000578*temp0f*rh0
-    ElseIf rh0>=10 AND rh0 < 50 Then
-      EMC = 2.22749 + 0.160107*rh0 - 0.014784*temp0f
-    ElseIf rh0>= 50 Then
-      EMC = 21.0606 + 0.005565*rh0*rh0 - 0.00035*rh0*temp0f - 0.483199*rh0
-    EndIf
-    fm1hr = (4.12*EMC+fm10hr)/5.0
-
 
     ' Campbell Scientific Fuel Moisture Station Package (CS506 & 107L)
     ' Campbell Scientific 10-Hour Fuel Moisture
