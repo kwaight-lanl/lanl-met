@@ -1,4 +1,4 @@
-' Built with assemble.py: 2026-11-12 14:19
+' Built with assemble.py: 2026-11-12 15:05
 ' assemble.py -tables dat1min dat15min dat24hr opsMonitor -parts cr1000x wind-horiz-1 wind-horiz-2 wind-horiz-3 wind-horiz-4 wind-vert-1 wind-vert-2 wind-vert-3 wind-vert-4 temp-metone-0 temp-metone-1 temp-metone-2 temp-metone-3 temp-metone-4 rh-rotronics-0 precip swdn swup lwdn lwup netrad fm1hr fm10hr fm100-1000hr pressure snow-laser TA6 -o ta6.cr1x
 
 
@@ -286,6 +286,9 @@ Const LWUPCal=3.87  ' Enter LWUPCal(LWUP) = Eppley Sensitivity Cal Constant in m
 
 'All Weather Tipping Bucket Rain Gauge
 Const p_precip = P2 'Rain Gauge P2 Channel
+
+' CS100 Barometric Pressure Sensor
+Const se_press = 1
 
 'SDMS40 Laser Snow Sensor
 Const sdi_snow = 1
